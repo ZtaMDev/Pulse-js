@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="200" height="200" alt="logo" src="./pulse.svg" />
+<img width="200" height="200" alt="logo" src="https://raw.githubusercontent.com/ZtaMDev/Pulse/refs/heads/main/pulse.svg" />
 
 # Pulse
 
