@@ -1,15 +1,31 @@
+<div align="center">
+
+<img width="200" height="200" alt="logo" src="./pulse.svg" />
+
 # Pulse
 
-A semantic reactivity system for modern applications. Separate reactive data (sources) from business conditions (guards) with a declarative, composable, and observable approach.
+> A semantic reactivity system for modern applications. Separate reactive data (sources) from business conditions (guards) with a declarative, composable, and observable approach.
 
-Pulse differs from traditional signals or state managers by treating "Conditions" as first-class citizens. Instead of embedding complex boolean logic inside components or selectors, you define semantic **Guards** that can be observed, composed, and debugged independently.
+Pulse differs from traditional signals or state managers by treating `Conditions` as first-class citizens. Instead of embedding complex boolean logic inside components or selectors, you define semantic **Guards** that can be observed, composed, and debugged independently.
+
+</div>
 
 ## Installation
 
 ```bash
-npm install @pulse-js/core @pulse-js/react @pulse-js/tools
-# or
-bun add @pulse-js/core @pulse-js/react @pulse-js/tools
+npm install @pulse-js/core @pulse-js/tools
+```
+
+### or
+
+```bash
+bun add @pulse-js/core @pulse-js/tools
+```
+
+Pulse works with React via adapters like `@pulse-js/react`.
+
+```bash
+bun add @pulse-js/react
 ```
 
 ## Core Concepts

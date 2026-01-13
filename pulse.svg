@@ -1,0 +1,84 @@
+<svg
+  width="500"
+  height="500"
+  viewBox="0 0 500 500"
+  xmlns="http://www.w3.org/2000/svg"
+>
+
+  <defs>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <radialGradient id="coreGradient" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="60%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </radialGradient>
+
+    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- OUTER RING (fills canvas) -->
+  <circle
+    cx="250"
+    cy="250"
+    r="215"
+    fill="none"
+    stroke="url(#ringGradient)"
+    stroke-width="12"
+    opacity="0.95"
+  />
+
+  <!-- Orbital micro pulses -->
+  <g fill="#e0f2fe" filter="url(#softGlow)">
+    <circle cx="250" cy="70" r="7"/>
+    <circle cx="380" cy="120" r="7"/>
+    <circle cx="430" cy="250" r="7"/>
+    <circle cx="380" cy="380" r="7"/>
+    <circle cx="250" cy="430" r="7"/>
+    <circle cx="120" cy="380" r="7"/>
+    <circle cx="70" cy="250" r="7"/>
+    <circle cx="120" cy="120" r="7"/>
+  </g>
+
+  <!-- Strong semantic points -->
+  <g fill="#bae6fd">
+    <circle cx="250" cy="70" r="9"/>
+    <circle cx="430" cy="250" r="9"/>
+    <circle cx="250" cy="430" r="9"/>
+    <circle cx="70" cy="250" r="9"/>
+  </g>
+
+  <!-- CORE -->
+  <circle
+    cx="250"
+    cy="250"
+    r="150"
+    fill="url(#coreGradient)"
+    filter="url(#softGlow)"
+  />
+
+  <!-- Inner pulses -->
+  <g fill="#ffffff">
+    <circle cx="250" cy="210" r="8"/>
+    <circle cx="210" cy="250" r="8"/>
+    <circle cx="290" cy="250" r="8"/>
+    <circle cx="250" cy="290" r="8"/>
+  </g>
+
+  <g fill="#dbeafe">
+    <circle cx="235" cy="235" r="6"/>
+    <circle cx="265" cy="235" r="6"/>
+    <circle cx="235" cy="265" r="6"/>
+    <circle cx="265" cy="265" r="6"/>
+  </g>
+
+</svg>
