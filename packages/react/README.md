@@ -64,6 +64,35 @@ function ProtectedRoute() {
 }
 ```
 
+## Developer Tools
+
+Pulse provides a dedicated inspector for debugging your reactive graph. In React applications, you can enable it with zero configuration.
+
+### Auto-Injection (Recommended)
+
+Simply import `@pulse-js/react/devtools` at the top of your main entry point (e.g., `main.tsx`). The inspector will automatically mount to the DOM only in development environments (`NODE_ENV === 'development'`).
+
+```tsx
+import "@pulse-js/react/devtools";
+```
+
+### Manual Component
+
+Alternatively, you can use the `PulseDevTools` component for more control:
+
+```tsx
+import { PulseDevTools } from "@pulse-js/react/devtools";
+
+function App() {
+  return (
+    <>
+      <MyRoutes />
+      <PulseDevTools shortcut="Ctrl+D" />
+    </>
+  );
+}
+```
+
 ## API
 
 ### `usePulse<T>(unit: PulseUnit<T>): T | GuardState<T>`

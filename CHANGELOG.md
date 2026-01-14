@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.1.6 (Solidification & Universal Tools)
+
+This release focuses on solidifying the core reactivity model and transforming the developer tools into a framework-agnostic solution.
+
+### 🚀 Core Improvements (@pulse-js/core 0.1.6)
+
+- **Independent `compute`**: The `compute` primitive is now a standalone export, allowing for pure, memoized transformations of Sources and Guards without the overhead of condition status.
+- **Robust Async Cancellation**: Introduced an internal `runId` versioning system for async guards. This automatically prevents race conditions by canceling stale asynchronous updates if the underlying dependencies change before a previous evaluation completes.
+- **Explainable Guards**: Added `.explain()` to the `Guard` interface. This returns a structured tree of the current status, failure reasons, and the status of all direct dependencies, significantly improving debuggability.
+
+### 🛠️ Universal DevTools (@pulse-js/tools 0.1.3)
+
+- **Web Component Transformation**: The DevTools suite has been completely rewritten into a framework-agnostic Web Component (`<pulse-inspector>`).
+- **Zero Dependencies**: Removed all React dependencies from the tools package. It is now usable in any environment (Vue, Svelte, Vanilla JS, etc.) with a single import.
+- **Explain API Integration**: The inspector now visualizes the dependency tree and detailed failure reasons provided by the new `explain()` API.
+
+### ⚛️ React Integration (@pulse-js/react 0.1.3)
+
+- **Zero-Config Auto-Injection**: Introducing `@pulse-js/react/devtools`. Simply importing this in your entry point automatically mounts the inspector in the DOM during development.
+- **`PulseDevTools` Component**: A new React component wrapper for fine-grained control over the inspector's placement and configuration.
+
+---
+
 ## v0.1.1 (Initial Base Release)
 
 We are excited to announce the first public release of **Pulse**, a semantic reactivity system for modern applications. This release establishes the core primitives and ecosystem under the new `@pulse-js` namespace.

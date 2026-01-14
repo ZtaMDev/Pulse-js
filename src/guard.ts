@@ -21,6 +21,23 @@ export interface GuardState<T> {
   value?: T;
   /** The message explaining why the guard failed (only if status is 'fail'). */
   reason?: string;
+  /** The timestamp when the status last changed. */
+  updatedAt?: number;
+}
+
+/**
+ * Detailed explanation of the Guard's current state and its dependencies.
+ */
+export interface GuardExplanation {
+  name: string;
+  status: GuardStatus;
+  reason?: string;
+  value?: any;
+  dependencies: Array<{
+    name: string;
+    type: 'source' | 'guard';
+    status?: GuardStatus;
+  }>;
 }
 
 /**
@@ -84,6 +101,12 @@ export interface Guard<T = boolean> {
   subscribe(listener: Subscriber<GuardState<T>>): () => void;
 
   /**
+   * Returns a structured explanation of the guard's state and its direct dependencies.
+   * Useful for DevTools and sophisticated error reporting.
+   */
+  explain(): GuardExplanation;
+
+  /**
    * Manually forces a re-evaluation of the guard.
    * Typically used internally by Pulse or for debugging.
    * @internal
@@ -127,9 +150,11 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
   const subscribers = new Set<Subscriber<GuardState<T>>>();
   let evaluationId = 0;
 
+  const dependencies = new Set<any>();
+
   const node: GuardNode = {
-    addDependency(trackable: Trackable) {
-      // Internal tracking
+    addDependency(trackable: any) {
+      dependencies.add(trackable);
     },
     notify() {
       evaluate();
@@ -140,34 +165,41 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
     const currentId = ++evaluationId;
     const oldStatus = state.status;
     const oldValue = state.value;
+    
+    // Clear dependencies before re-evaluation
+    dependencies.clear();
 
     try {
       const result = runInContext(node, () => evaluator());
 
       if (result instanceof Promise) {
-        state = { status: 'pending' };
+        if (state.status !== 'pending') {
+          state = { ...state, status: 'pending', updatedAt: Date.now() };
+          notifyDependents();
+        }
+        
         result
           .then(resolved => {
             if (currentId === evaluationId) {
               if (resolved === false) {
-                state = { status: 'fail', reason: name ? `${name} failed` : 'condition failed' };
+                state = { status: 'fail', reason: name ? `${name} failed` : 'condition failed', updatedAt: Date.now() };
               } else {
-                state = { status: 'ok', value: resolved };
+                state = { status: 'ok', value: resolved, updatedAt: Date.now() };
               }
               notifyDependents();
             }
           })
           .catch(err => {
             if (currentId === evaluationId) {
-              state = { status: 'fail', reason: err instanceof Error ? err.message : String(err) };
+              state = { status: 'fail', reason: err instanceof Error ? err.message : String(err), updatedAt: Date.now() };
               notifyDependents();
             }
           });
       } else {
         if (result === false) {
-          state = { status: 'fail', reason: name ? `${name} failed` : 'condition failed' };
+          state = { status: 'fail', reason: name ? `${name} failed` : 'condition failed', updatedAt: Date.now() };
         } else {
-          state = { status: 'ok', value: result as T };
+          state = { status: 'ok', value: result as T, updatedAt: Date.now() };
         }
         
         if (oldStatus !== state.status || oldValue !== state.value) {
@@ -175,7 +207,7 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
         }
       }
     } catch (err) {
-      state = { status: 'fail', reason: err instanceof Error ? err.message : String(err) };
+      state = { status: 'fail', reason: err instanceof Error ? err.message : String(err), updatedAt: Date.now() };
       notifyDependents();
     }
   };
@@ -190,46 +222,69 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
   // Initial evaluation
   evaluate();
 
-  const handleRead = () => {
+  const track = () => {
     const activeGuard = getCurrentGuard();
     if (activeGuard && activeGuard !== node) {
-        dependents.add(activeGuard);
+      dependents.add(activeGuard);
+      activeGuard.addDependency(g);
     }
   };
 
   const g = (() => {
-    handleRead();
+    track();
     return state.status === 'ok' ? state.value : undefined;
   }) as Guard<T>;
 
   g.ok = () => {
-    handleRead();
+    track();
     return state.status === 'ok';
   };
   
   g.fail = () => {
-    handleRead();
+    track();
     return state.status === 'fail';
   };
   
   g.pending = () => {
-    handleRead();
+    track();
     return state.status === 'pending';
   };
 
   g.reason = () => {
-    handleRead();
+    track();
     return state.reason;
   };
   
   g.state = () => {
-    handleRead();
+    track();
     return state;
   };
 
   g.subscribe = (listener: Subscriber<GuardState<T>>) => {
     subscribers.add(listener);
     return () => subscribers.delete(listener);
+  };
+
+  g.explain = (): GuardExplanation => {
+    const deps: Array<{ name: string; type: 'source' | 'guard'; status?: GuardStatus }> = [];
+    
+    dependencies.forEach(dep => {
+       const depName = (dep as any)._name || 'unnamed';
+       const isG = 'state' in dep;
+       deps.push({
+         name: depName,
+         type: isG ? 'guard' : 'source',
+         status: isG ? (dep as any).state().status : undefined
+       });
+    });
+
+    return {
+      name: name || 'guard',
+      status: state.status,
+      reason: state.reason,
+      value: state.value,
+      dependencies: deps
+    };
   };
   
   g._evaluate = () => evaluate();

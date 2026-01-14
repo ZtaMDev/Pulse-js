@@ -60,13 +60,18 @@
       <div id="checkout-section" style="margin-top: 20px">
         <p>Cart Total: $150</p>
         <button id="checkout-btn">Checkout</button>
+        <button id="add-balance-btn">Add balance</button>
       </div>
 
       <div id="status-display" class="status"></div>
     </div>
 
+    <!-- Pulse DevTools (Framework Agnostic) -->
+    <pulse-inspector shortcut="Ctrl+D"></pulse-inspector>
+
     <script type="module">
-      import { source, guard } from "@pulse/core";
+      import { source, guard } from "../src/index.ts";
+      import "../packages/tools/src/index.ts";
 
       // 1. Define State (Sources)
       const user = source(null, { name: "user" });
@@ -86,6 +91,7 @@
       // --- UI Logic ---
       const statusDiv = document.getElementById("status-display");
       const checkoutBtn = document.getElementById("checkout-btn");
+      const addBalanceBtn = document.getElementById("add-balance-btn");
 
       function updateUI() {
         // Re-render UI based on Guard states
@@ -102,15 +108,6 @@
           statusDiv.innerText = "⏳ Checking permissions...";
           checkoutBtn.disabled = true;
         }
-
-        console.log(
-          "User:",
-          user(),
-          "Role:",
-          userRole(),
-          "Balance:",
-          balance()
-        );
       }
 
       // Pulse doesn't have guard.subscribe() in Core
@@ -134,7 +131,12 @@
         userRole.set("guest");
       };
 
+      document.getElementById("add-balance-btn").onclick = () => {
+        balance.update((prev) => prev + 100);
+      };
+
       updateUI();
+      console.log(balance.explain);
     </script>
   </body>
 </html>

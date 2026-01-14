@@ -6,7 +6,17 @@
 
 > A semantic reactivity system for modern applications. Separate reactive data (sources) from business conditions (guards) with a declarative, composable, and observable approach.
 
-Pulse differs from traditional signals or state managers by treating `Conditions` as first-class citizens. Instead of embedding complex boolean logic inside components or selectors, you define semantic **Guards** that can be observed, composed, and debugged independently.
+Pulse differs from traditional signals or state managers by treating `Conditions` as first-class citizens. Instead of embedding complex boolean logic inside components or selectors, you define **Semantic Guards** that can be observed, composed, and debugged independently.
+
+### Mental Model
+
+Compare Pulse primitives at a glance:
+
+| Concept     | Can be async | Has state | Observable | Purpose                              |
+| :---------- | :----------: | :-------: | :--------: | :----------------------------------- |
+| **Source**  |      ❌      |    ❌     |     ✅     | Reactive data (facts).               |
+| **Guard**   |      ✅      |    ✅     |     ✅     | Business rules (conditioned truths). |
+| **Compute** |      ❌      |    ❌     |     ✅     | Pure transformations (derivations).  |
 
 </div>
 
@@ -53,7 +63,7 @@ rawCount.update((n) => n + 1);
 
 ### Guards (Semantic Logic)
 
-Guards represent business rules or derivations. They are not just boolean flags; they track their own state including `status` (ok, fail, pending) and `reason` (why it failed).
+Guards represent business rules or derivations. A Guard is not just a boolean: it is a **Semantic Guard**—an observable rule with context. They track their own state including `status` (ok, fail, pending) and `reason` (why it failed).
 
 ```typescript
 import { guard } from "@pulse-js/core";
@@ -73,9 +83,23 @@ if (isAdmin.ok()) {
 }
 ```
 
-### Async Guards
+### Computed Values
+
+You can derive new data from sources or other guards using `compute`. It works like a memoized transformation that automatically re-evaluates when dependencies change.
+
+```typescript
+import { compute } from "@pulse-js/core";
+
+const fullName = compute("full-name", [firstName, lastName], (first, last) => {
+  return `${first} ${last}`;
+});
+```
+
+### Async Guards & Race Control
 
 Pulse handles asynchronous logic natively. Guards can return Promises, and their status will automatically transition from `pending` to `ok` or `fail`.
+
+Pulse implements internal **runId versioning** to automatically cancel stale async evaluations if the underlying sources change multiple times before a promise resolves, preventing race conditions.
 
 ```typescript
 const isServerOnline = guard("check-server", async () => {
@@ -83,46 +107,16 @@ const isServerOnline = guard("check-server", async () => {
   if (!response.ok) throw new Error("Server unreachable");
   return true;
 });
-
-// Check status synchronously non-blocking
-if (isServerOnline.pending()) {
-  showSpinner();
-}
 ```
 
-### Composition
+### Explanable Guards
 
-Guards can be composed using logical operators. This creates a semantic tree of conditions that is easy to debug.
+For complex conditions, you can call `.explain()` to get a structured tree of the current status, failure reason, and the status of all direct dependencies.
 
-```typescript
-import { guard } from "@pulse-js/core";
-
-// .all() - Success only if ALL pass. Fails with the reason of the first failure.
-const canCheckout = guard.all("can-checkout", [
-  isAuthenticated,
-  hasItemsInCart,
-  isServerOnline,
-]);
-
-// .any() - Success if AT LEAST ONE passes.
-const hasAccess = guard.any("has-access", [isAdmin, isEditor]);
-
-// .not() - Inverts the logical result.
-const isGuest = guard.not("is-guest", isAuthenticated);
-```
-
-### Computed Values
-
-You can derive new data from sources or other guards using `guard.compute`.
-
-```typescript
-const fullName = guard.compute(
-  "full-name",
-  [firstName, lastName],
-  (first, last) => {
-    return `${first} ${last}`;
-  }
-);
+```ts
+const explanation = canCheckout.explain();
+console.log(explanation);
+// { status: 'fail', reason: 'auth failed', dependencies: [...] }
 ```
 
 ## Server-Side Rendering (SSR)

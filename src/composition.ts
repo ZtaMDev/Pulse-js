@@ -1,5 +1,5 @@
-
 import { guard, type Guard } from './guard';
+import { compute } from './compute';
 
 /**
  * Type guard to check if a target is a Pulse Guard.
@@ -110,16 +110,7 @@ export function guardNot(nameOrTarget: string | Guard<any> | (() => any), maybeT
  * const fullName = guard.compute('full-name', [firstName, lastName], (f, l) => `${f} ${l}`);
  * ```
  */
-export function guardCompute<T, R>(
-  name: string,
-  dependencies: any[],
-  processor: (...args: any[]) => R
-): Guard<R> {
-  return guard(name, () => {
-    const values = dependencies.map(dep => (typeof dep === 'function' ? dep() : dep));
-    return processor(...values);
-  });
-}
+
 
 /**
  * Internal extensions object for the `guard` function.
@@ -129,5 +120,5 @@ export const guardExtensions = {
   all: guardAll,
   any: guardAny,
   not: guardNot,
-  compute: guardCompute
+  compute: compute
 };

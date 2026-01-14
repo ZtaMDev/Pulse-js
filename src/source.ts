@@ -127,6 +127,7 @@ export function source<T>(initialValue: T, options: SourceOptions<T> = {}): Sour
     const activeGuard = getCurrentGuard();
     if (activeGuard) {
       dependents.add(activeGuard);
+      activeGuard.addDependency(s);
     }
     return value;
   }) as Source<T>;

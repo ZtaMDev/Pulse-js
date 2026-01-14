@@ -9,6 +9,7 @@
 export * from './tracking';
 export * from './source';
 export * from './guard';
+export * from './compute';
 export * from './ssr';
 export * from './registry';
 

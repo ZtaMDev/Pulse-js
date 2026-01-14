@@ -21,7 +21,7 @@ export interface GuardNode extends Trackable {
    * Registers a dependency for this guard.
    * Internal use only.
    */
-  addDependency(trackable: Trackable): void;
+  addDependency(trackable: any): void;
 }
 
 /** 

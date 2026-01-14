@@ -1,6 +1,6 @@
 {
   "name": "@pulse-js/tools",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -9,15 +9,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "bun x tsup src/index.tsx --format esm,cjs --dts --clean --external react,react-dom,@pulse-js/core,@pulse-js/react",
+    "build": "bun x tsup src/index.ts --format esm,cjs --dts --clean --external @pulse-js/core",
     "lint": "bun x tsc --noEmit"
   },
-  "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
-  },
   "dependencies": {
-    "@pulse-js/core": "^0.1.5",
-    "@pulse-js/react": "^0.1.2"
+    "@pulse-js/core": "^0.1.5"
   }
 }

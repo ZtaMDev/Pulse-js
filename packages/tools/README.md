@@ -8,7 +8,9 @@ The official visual debugging suite for the Pulse ecosystem. Inspect, monitor, a
 - **Quadrant-Aware Anchoring**: Intelligent positioning system. The panel automatically expands from the corner closest to its current position (top-left, bottom-right, etc.), ensuring the UI never jumps or floats awkwardly.
 - **Persistent State**: innovative positioning engine remembers exactly where you left the widget, persisting across page reloads and HMR updates.
 - **Real-Time Inspection**: Visualize the status (OK, FAIL, PENDING) and values of all registered Sources and Guards instantly.
+- **Explain API Integration**: Full support for the `guard.explain()` method, showing semantic failure reasons and dependencies.
 - **Glassmorphism Design**: A modern, dark-themed aesthetic that fits seamlessly into developer workflows without obstructing functionality.
+- **Framework-Agnostic**: Built as a standard Web Component, usable in any environment (React, Vue, Svelte, or Vanilla JS).
 
 ## Installation
 
@@ -18,22 +20,32 @@ npm install @pulse-js/tools
 
 ## Usage
 
-### React Integration
+### React Integration (Recommended)
 
-Simply inject the `<PulseDevTools />` component anywhere in your root application tree. It renders as a portal and will not affect your layout.
+The easiest way to use Pulse Tools in React is via the `@pulse-js/react` package, which handles auto-injection.
 
 ```tsx
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { PulseDevTools } from "@pulse-js/tools";
-import App from "./App";
+// main.tsx
+import "@pulse-js/react/devtools";
+```
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-    <PulseDevTools shortcut="Ctrl+D" />
-  </React.StrictMode>
-);
+### Vanilla / Other Frameworks
+
+You can use the `<pulse-inspector>` Web Component directly.
+
+```html
+<script type="module" src="node_modules/@pulse-js/tools/dist/index.js"></script>
+
+<pulse-inspector shortcut="Ctrl+D"></pulse-inspector>
+```
+
+Or in JavaScript:
+
+```javascript
+import "@pulse-js/tools";
+
+const inspector = document.createElement("pulse-inspector");
+document.body.appendChild(inspector);
 ```
 
 ### Configuration Props

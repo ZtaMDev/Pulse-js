@@ -7,9 +7,9 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@pulse-js/core": resolve(__dirname, "../src/index.ts"),
-      "@pulse-js/react": resolve(__dirname, "../packages/react/src/index.ts"),
-      "@pulse-js/tools": resolve(__dirname, "../packages/tools/src/index.tsx"),
+      "@pulse-js/core": resolve(__dirname, "../src"),
+      "@pulse-js/react": resolve(__dirname, "../packages/react/src"),
+      "@pulse-js/tools": resolve(__dirname, "../packages/tools/src"),
     },
   },
   server: {
