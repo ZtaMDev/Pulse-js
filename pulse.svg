@@ -30,7 +30,7 @@
   <circle
     cx="250"
     cy="250"
-    r="215"
+    r="170"
     fill="none"
     stroke="url(#ringGradient)"
     stroke-width="12"
@@ -38,24 +38,6 @@
   />
 
   <!-- Orbital micro pulses -->
-  <g fill="#e0f2fe" filter="url(#softGlow)">
-    <circle cx="250" cy="70" r="7"/>
-    <circle cx="380" cy="120" r="7"/>
-    <circle cx="430" cy="250" r="7"/>
-    <circle cx="380" cy="380" r="7"/>
-    <circle cx="250" cy="430" r="7"/>
-    <circle cx="120" cy="380" r="7"/>
-    <circle cx="70" cy="250" r="7"/>
-    <circle cx="120" cy="120" r="7"/>
-  </g>
-
-  <!-- Strong semantic points -->
-  <g fill="#bae6fd">
-    <circle cx="250" cy="70" r="9"/>
-    <circle cx="430" cy="250" r="9"/>
-    <circle cx="250" cy="430" r="9"/>
-    <circle cx="70" cy="250" r="9"/>
-  </g>
 
   <!-- CORE -->
   <circle
