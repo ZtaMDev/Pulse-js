@@ -69,6 +69,60 @@ describe('Pulse Core', () => {
       expect(failing.fail()).toBe(true);
       expect(failing.reason()).toBe('boom');
     });
+
+    it('should detect cyclic dependencies', () => {
+      const toggle = source(false);
+      const a: any = guard('A', () => {
+        if (toggle()) return !b(); // Force value change to trigger notification loop
+        return true;
+      });
+      const b: any = guard('B', () => a());
+      
+      // Initially OK
+      expect(a()).toBe(true);
+
+      // Trigger cycle - this will now loop because A depends on !B and B depends on A
+      toggle.set(true);
+      expect(a.fail()).toBe(true);
+      expect(a.reason()).toMatch(/Cyclic guard dependency detected/);
+    });
+
+    it('should persist dependencies even on failure', () => {
+      const s = source(1, { name: 'S' });
+      const g = guard('G', () => {
+        const val = s();
+        if (val > 0) throw new Error('fail early');
+        return true;
+      });
+
+      expect(g.fail()).toBe(true);
+      const explanation = g.explain();
+      expect(explanation.dependencies.some(d => d.name === 'S')).toBe(true);
+    });
+
+    it('should support structured reason metadata', () => {
+      const failing = guard(() => {
+        const err: any = new Error('structured');
+        err.code = 'ERR_AUTH';
+        err.meta = { user: 'guest' };
+        throw err;
+      });
+
+      expect(failing.fail()).toBe(true);
+      const reason: any = failing.reason();
+      expect(reason.code).toBe('ERR_AUTH');
+      expect(reason.meta.user).toBe('guest');
+    });
+
+    it('should distinguish undefined (pending) from false (fail)', () => {
+      const g = guard(() => undefined);
+      expect(g.pending()).toBe(true);
+      expect(g.fail()).toBe(false);
+
+      const f = guard(() => false);
+      expect(f.fail()).toBe(true);
+      expect(f.pending()).toBe(false);
+    });
   });
 
   describe('composition', () => {

@@ -6,10 +6,19 @@ import { PulseRegistry } from './registry';
 /**
  * Status of a Pulse Guard evaluation.
  * - 'pending': Async evaluation is in progress.
- * - 'ok': Evaluation completed successfully (return value was not `false`).
- * - 'fail': Evaluation encountered an error or return value was `false`.
+ * - 'ok': Evaluation completed successfully.
+ * - 'fail': Evaluation encountered an error or return value was explicitly `false`.
  */
 export type GuardStatus = 'ok' | 'fail' | 'pending';
+
+/**
+ * Structured reason for a guard failure.
+ */
+export interface GuardReason {
+  code: string;
+  message: string;
+  meta?: any;
+}
 
 /**
  * The internal state of a Pulse Guard.
@@ -19,8 +28,10 @@ export interface GuardState<T> {
   status: GuardStatus;
   /** The value returned by the evaluator (only if status is 'ok'). */
   value?: T;
-  /** The message explaining why the guard failed (only if status is 'fail'). */
-  reason?: string;
+  /** The reason why the guard failed. */
+  reason?: string | GuardReason;
+  /** The last known failure reason, persisted even during 'pending'. */
+  lastReason?: string | GuardReason;
   /** The timestamp when the status last changed. */
   updatedAt?: number;
 }
@@ -31,7 +42,8 @@ export interface GuardState<T> {
 export interface GuardExplanation {
   name: string;
   status: GuardStatus;
-  reason?: string;
+  reason?: string | GuardReason;
+  lastReason?: string | GuardReason;
   value?: any;
   dependencies: Array<{
     name: string;
@@ -82,7 +94,7 @@ export interface Guard<T = boolean> {
    * 
    * @returns The error message or undefined.
    */
-  reason(): string | undefined;
+  reason(): string | GuardReason | undefined;
 
   /**
    * Returns a snapshot of the full internal state of the guard.
@@ -102,13 +114,11 @@ export interface Guard<T = boolean> {
 
   /**
    * Returns a structured explanation of the guard's state and its direct dependencies.
-   * Useful for DevTools and sophisticated error reporting.
    */
   explain(): GuardExplanation;
 
   /**
    * Manually forces a re-evaluation of the guard.
-   * Typically used internally by Pulse or for debugging.
    * @internal
    */
   _evaluate(): void;
@@ -150,11 +160,13 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
   const subscribers = new Set<Subscriber<GuardState<T>>>();
   let evaluationId = 0;
 
-  const dependencies = new Set<any>();
+  // Track the dependencies across evaluations
+  const currentDeps = new Set<any>();
+  let lastDeps = new Set<any>();
 
   const node: GuardNode = {
     addDependency(trackable: any) {
-      dependencies.add(trackable);
+      currentDeps.add(trackable);
     },
     notify() {
       evaluate();
@@ -165,51 +177,91 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
     const currentId = ++evaluationId;
     const oldStatus = state.status;
     const oldValue = state.value;
-    
-    // Clear dependencies before re-evaluation
-    dependencies.clear();
+    // Start fresh tracking
+    currentDeps.clear();
 
     try {
-      const result = runInContext(node, () => evaluator());
+      runInContext(node, () => {
+        // 1. Run the evaluator
+        node.isEvaluating = true;
+        let result: T | Promise<T>;
+        try {
+          result = _evaluator();
+        } finally {
+          node.isEvaluating = false;
+        }
 
-      if (result instanceof Promise) {
-        if (state.status !== 'pending') {
-          state = { ...state, status: 'pending', updatedAt: Date.now() };
-          notifyDependents();
-        }
-        
-        result
-          .then(resolved => {
-            if (currentId === evaluationId) {
-              if (resolved === false) {
-                state = { status: 'fail', reason: name ? `${name} failed` : 'condition failed', updatedAt: Date.now() };
-              } else {
-                state = { status: 'ok', value: resolved, updatedAt: Date.now() };
-              }
-              notifyDependents();
-            }
-          })
-          .catch(err => {
-            if (currentId === evaluationId) {
-              state = { status: 'fail', reason: err instanceof Error ? err.message : String(err), updatedAt: Date.now() };
-              notifyDependents();
-            }
-          });
-      } else {
-        if (result === false) {
-          state = { status: 'fail', reason: name ? `${name} failed` : 'condition failed', updatedAt: Date.now() };
-        } else {
-          state = { status: 'ok', value: result as T, updatedAt: Date.now() };
-        }
-        
-        if (oldStatus !== state.status || oldValue !== state.value) {
+        // 2. Handle the result
+        if (result instanceof Promise) {
+          if (state.status !== 'pending') {
+            state = { ...state, status: 'pending', updatedAt: Date.now() };
             notifyDependents();
+          }
+          
+          result
+            .then(resolved => {
+              if (currentId === evaluationId) {
+                persistDependencies();
+                if (resolved === false) {
+                  const reason = name ? `${name} failed` : 'condition failed';
+                  state = { status: 'fail', reason, lastReason: reason, updatedAt: Date.now() };
+                } else if (resolved === undefined) {
+                  state = { ...state, status: 'pending', updatedAt: Date.now() };
+                } else {
+                  state = { status: 'ok', value: resolved, updatedAt: Date.now() };
+                }
+                notifyDependents();
+              }
+            })
+            .catch(err => {
+              if (currentId === evaluationId) {
+                persistDependencies();
+                const reason = err instanceof Error ? err.message : String(err);
+                state = { 
+                  status: 'fail', 
+                  reason: err.meta ? { code: err.code || 'ERROR', message: reason, meta: err.meta } : reason, 
+                  lastReason: state.reason || reason,
+                  updatedAt: Date.now() 
+                };
+                notifyDependents();
+              }
+            });
+        } else {
+          persistDependencies();
+          if (result === false) {
+            const reason = name ? `${name} failed` : 'condition failed';
+            state = { status: 'fail', reason, lastReason: reason, updatedAt: Date.now() };
+          } else if (result === undefined) {
+            state = { ...state, status: 'pending', updatedAt: Date.now() };
+          } else {
+            state = { status: 'ok', value: result as T, updatedAt: Date.now() };
+          }
+          
+          if (oldStatus !== state.status || oldValue !== state.value) {
+              notifyDependents();
+          }
         }
-      }
-    } catch (err) {
-      state = { status: 'fail', reason: err instanceof Error ? err.message : String(err), updatedAt: Date.now() };
+      });
+    } catch (err: any) {
+      node.isEvaluating = false;
+      persistDependencies();
+      const reason = err instanceof Error ? err.message : String(err);
+      state = { 
+        status: 'fail', 
+        reason: err.meta ? { code: err.code || 'ERROR', message: reason, meta: err.meta } : reason, 
+        lastReason: reason,
+        updatedAt: Date.now() 
+      };
+      // Break cycles by notifying failing state
       notifyDependents();
     }
+  };
+
+  // Helper to call the evaluator within correct scope
+  const _evaluator = () => evaluator();
+
+  const persistDependencies = () => {
+    lastDeps = new Set(currentDeps);
   };
 
   const notifyDependents = () => {
@@ -219,10 +271,11 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
     subscribers.forEach(sub => sub({ ...state }));
   };
 
-  // Initial evaluation
-  evaluate();
 
   const track = () => {
+    if (node.isEvaluating) {
+        throw new Error(`Cyclic guard dependency detected: ${name || 'unnamed guard'}`);
+    }
     const activeGuard = getCurrentGuard();
     if (activeGuard && activeGuard !== node) {
       dependents.add(activeGuard);
@@ -252,7 +305,7 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
 
   g.reason = () => {
     track();
-    return state.reason;
+    return state.reason || state.lastReason;
   };
   
   g.state = () => {
@@ -268,7 +321,7 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
   g.explain = (): GuardExplanation => {
     const deps: Array<{ name: string; type: 'source' | 'guard'; status?: GuardStatus }> = [];
     
-    dependencies.forEach(dep => {
+    lastDeps.forEach(dep => {
        const depName = (dep as any)._name || 'unnamed';
        const isG = 'state' in dep;
        deps.push({
@@ -282,6 +335,7 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
       name: name || 'guard',
       status: state.status,
       reason: state.reason,
+      lastReason: state.lastReason,
       value: state.value,
       dependencies: deps
     };
@@ -303,5 +357,10 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
 
   PulseRegistry.register(g);
 
+  // Initial evaluation must happen after g is fully defined
+  // to allow cycle detection to work even during initial run.
+  evaluate();
+
   return g;
 }
+

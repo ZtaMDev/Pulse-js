@@ -329,6 +329,18 @@ class PulseInspector extends HTMLElement {
       const explanation = g.explain();
       const statusClass = `status-${explanation.status}`;
       
+      const renderReason = (reason: any) => {
+        if (!reason) return '';
+        if (typeof reason === 'string') return `<div class="reason">${reason}</div>`;
+        return `
+          <div class="reason">
+            <div style="font-weight:bold;font-size:9px;margin-bottom:2px">${reason.code}</div>
+            ${reason.message}
+            ${reason.meta ? `<pre style="font-size:8px;margin-top:4px;opacity:0.7">${JSON.stringify(reason.meta, null, 2)}</pre>` : ''}
+          </div>
+        `;
+      };
+
       return `
         <div class="unit-card" style="border-color: ${explanation.status === 'fail' ? COLORS.error + '44' : COLORS.border}">
           <div class="unit-header">
@@ -338,9 +350,16 @@ class PulseInspector extends HTMLElement {
             </span>
             <span class="unit-type">Guard</span>
           </div>
-          ${explanation.status === 'ok' ? `<div class="value">Value: ${JSON.stringify(explanation.value)}</div>` : ''}
-          ${explanation.status === 'fail' ? `<div class="reason">${explanation.reason}</div>` : ''}
-          ${explanation.status === 'pending' ? `<div style="opacity:0.5">Evaluating...</div>` : ''}
+          ${explanation.status === 'ok' ? `<div class="value">Value: ${JSON.stringify(explanation.value, null, 2)}</div>` : ''}
+          
+          ${explanation.status === 'fail' ? renderReason(explanation.reason) : ''}
+          ${explanation.status === 'pending' ? `
+            <div style="opacity:0.5;margin-bottom:4px">Evaluating...</div>
+            ${explanation.lastReason ? `
+              <div style="font-size:9px;opacity:0.6;margin-bottom:2px">LAST FAILURE:</div>
+              ${renderReason(explanation.lastReason)}
+            ` : ''}
+          ` : ''}
           
           ${explanation.dependencies.length > 0 ? `
             <div class="explanation">

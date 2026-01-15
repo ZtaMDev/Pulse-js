@@ -22,13 +22,16 @@ export interface GuardNode extends Trackable {
    * Internal use only.
    */
   addDependency(trackable: any): void;
+  /** Whether the guard is currently evaluating. */
+  isEvaluating?: boolean;
 }
 
 /** 
  * Global state for reactive context tracking.
- * Used to identify which guard is currently evaluating.
+ * Used to identify which guards are currently evaluating.
+ * Uses a stack to detect cyclic dependencies.
  */
-let activeGuard: GuardNode | null = null;
+let guardStack: GuardNode[] = [];
 
 /**
  * Executes a function within the context of a specific Guard.
@@ -38,14 +41,18 @@ let activeGuard: GuardNode | null = null;
  * @param guard The guard node to set as active.
  * @param fn The function to execute.
  * @returns The result of the function.
+ * @throws Error if a cyclic dependency is detected.
  */
 export function runInContext<T>(guard: GuardNode, fn: () => T): T {
-  const prev = activeGuard;
-  activeGuard = guard;
+  if (guardStack.includes(guard)) {
+    throw new Error(`Cyclic guard dependency detected: ${(guard as any)._name || 'unnamed guard'}`);
+  }
+
+  guardStack.push(guard);
   try {
     return fn();
   } finally {
-    activeGuard = prev;
+    guardStack.pop();
   }
 }
 
@@ -56,5 +63,5 @@ export function runInContext<T>(guard: GuardNode, fn: () => T): T {
  * @internal
  */
 export function getCurrentGuard(): GuardNode | null {
-  return activeGuard;
+  return guardStack[guardStack.length - 1] ?? null;
 }
