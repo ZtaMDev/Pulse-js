@@ -8,16 +8,6 @@
 
 Pulse differs from traditional signals or state managers by treating `Conditions` as first-class citizens. Instead of embedding complex boolean logic inside components or selectors, you define **Semantic Guards** that can be observed, composed, and debugged independently.
 
-### Mental Model
-
-Compare Pulse primitives at a glance:
-
-| Concept     | Can be async | Has state | Observable | Purpose                              |
-| :---------- | :----------: | :-------: | :--------: | :----------------------------------- |
-| **Source**  |      ❌      |    ❌     |     ✅     | Reactive data (facts).               |
-| **Guard**   |      ✅      |    ✅     |     ✅     | Business rules (conditioned truths). |
-| **Compute** |      ❌      |    ❌     |     ✅     | Pure transformations (derivations).  |
-
 </div>
 
 ## Installation
@@ -145,6 +135,16 @@ import { hydrate } from "@pulse-js/core";
 // 1. Hydrate before rendering
 hydrate(window.__PULSE_STATE__);
 ```
+
+### Mental Model
+
+Compare Pulse primitives:
+
+| Concept     | Can be async | Has state | Observable | Purpose                              |
+| :---------- | :----------: | :-------: | :--------: | :----------------------------------- |
+| **Source**  |      ❌      |    ❌     |     ✅     | Reactive data (facts).               |
+| **Guard**   |      ✅      |    ✅     |     ✅     | Business rules (conditioned truths). |
+| **Compute** |      ❌      |    ❌     |     ✅     | Pure transformations (derivations).  |
 
 ## API Reference
 
