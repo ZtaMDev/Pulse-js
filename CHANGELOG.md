@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.1.7 (Enterprise Reactivity & Cycle Detection)
+
+This release focuses on hardening the core engine for large-scale applications with improved failure tracking, cyclic dependency detection, and enterprise-grade metadata.
+
+### Core Improvements (@pulse-js/core 0.1.7)
+
+- **Cyclic Dependency Detection**: Added a robust stack-based detection mechanism that catches infinite reactive loops (A -> B -> A) and reports them as descriptive failure reasons instead of causing stack overflows.
+- **Persistent Dependency Insights**: The `.explain()` graph now persists even after a failure. Previously, failing early would clear downstream dependencies; now it remembers the last known graph for better debugging.
+- **Structured Reason Metadata**: Introduced the `GuardReason` interface. Evaluators can now throw objects with `code`, `message`, and `meta` to provide rich error context to the UI.
+- **Semantic State Preservation**: When a failed Guard re-evaluates, its `lastReason` is preserved while `pending`, preventing UI flickering and allowing users to see the previous error while the next attempt is in progress.
+- **Flexible Pending State**: Returning `undefined` from a Guard evaluator now explicitly marks it as `pending`, simplifying data fetching and "not ready" patterns.
+
+### DevTools Improvements (@pulse-js/tools 0.1.4)
+
+- **Metadata Rendering**: The inspector now renders structured failure reasons, including error codes and JSON metadata snippets.
+- **Evaluation State Tracking**: Visual indicators for `lastReason` when a guard is in a `pending` state after a failure.
+- **Dependency Status**: Dependency lists now show the status of each dependent guard for faster troubleshooting.
+
+### React Integration (@pulse-js/react 0.1.4)
+
+- **Updated Dependencies**: Bumped to use `@pulse-js/core@0.1.7` and `@pulse-js/tools@0.1.4`.
+
+---
+
 ## v0.1.6 (Solidification & Universal Tools)
 
 This release focuses on solidifying the core reactivity model and transforming the developer tools into a framework-agnostic solution.
