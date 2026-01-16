@@ -109,8 +109,6 @@
           checkoutBtn.disabled = true;
         }
       }
-
-      // Pulse doesn't have guard.subscribe() in Core
       // We sync by subscribing to sources or use an interval for this demo
       // In Pulse React adapter this is automatic.
       setInterval(updateUI, 100);

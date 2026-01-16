@@ -1,5 +1,5 @@
 import { source, guard } from '@pulse-js/core';
-import { usePulse } from '@pulse-js/react';
+import { usePulse, formatReason, useGuard } from '@pulse-js/react';
 
 // 1. Logic (Outside Component)
 const user = source<any>(null, { name: 'user' });
@@ -15,7 +15,7 @@ const canPurchase = guard.all('can-purchase', [
 
 // 2. UI Component
 export function PurchaseWidget() {
-    const purchaseState = usePulse(canPurchase);
+    const purchaseState = useGuard(canPurchase);
     const currentUser = usePulse(user);
     const currentBalance = usePulse(balance);
     
@@ -32,7 +32,7 @@ export function PurchaseWidget() {
             <div style={{ marginTop: '1rem' }}>
                 <p>Status: <strong>{purchaseState.status.toUpperCase()}</strong></p>
                 {purchaseState.status === 'fail' && (
-                    <p style={{ color: 'red' }}>Reason: {purchaseState.reason}</p>
+                    <p style={{ color: 'red' }}>Reason: {formatReason(purchaseState.reason)}</p>
                 )}
                 
                 <button 

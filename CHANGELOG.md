@@ -1,4 +1,30 @@
-# Changelog
+## v0.1.8 (React Compatibility & Cyclic Fixes)
+
+This release significantly improves React ergonomics and fixes critical bugs in the cyclic dependency detection logic.
+
+### Core Improvements (@pulse-js/core 0.1.8)
+
+- **Fixed Cyclic Dependency Detection**: The detection logic has been completely overhauled. It now correctly identifies true cycles (A -> A) without false positives for nested guard compositions (e.g., `guard.all` reading children).
+- **`GuardReason` Interface**: The `GuardReason` interface now includes a `toString()` signature. This ensures that reason objects can be safely converted to strings in all environments.
+
+### React Integration (@pulse-js/react 0.1.5)
+
+- **`formatReason` Helper**: A new utility function to easily render guard failure reasons in JSX.
+  ```tsx
+  import { formatReason } from "@pulse-js/react";
+  // ...
+  <p>{formatReason(reason)}</p>;
+  ```
+- **Improved Types**: Internal improvements to how types are exported to prevent circular dependencies during builds.
+
+### DevTools 2.0 (@pulse-js/tools 0.1.5)
+
+- **Tabbed Interface**: New split view with "Inspector" (list) and "Pulse Tree" (dependency graph).
+- **Pulse Tree Visualization**: Recursive tree view showing the entire dependency graph of your guards.
+  - Expand/Collapse nodes to trace logic flows.
+  - View status and failure reasons at every level of the tree.
+- **Editable Sources**: Click on any Source value in the inspector to edit it directly. Supports JSON syntax for objects/arrays.
+- **Enhanced UI**: Improved "Pill" design, better colors, and drag-and-drop mechanics.
 
 ## v0.1.7 (Enterprise Reactivity & Cycle Detection)
 

@@ -4,13 +4,12 @@ The official visual debugging suite for the Pulse ecosystem. Inspect, monitor, a
 
 ## Features
 
-- **Draggable UI**: A floating widget that lives anywhere on your screen.
-- **Quadrant-Aware Anchoring**: Intelligent positioning system. The panel automatically expands from the corner closest to its current position (top-left, bottom-right, etc.), ensuring the UI never jumps or floats awkwardly.
-- **Persistent State**: innovative positioning engine remembers exactly where you left the widget, persisting across page reloads and HMR updates.
-- **Real-Time Inspection**: Visualize the status (OK, FAIL, PENDING) and values of all registered Sources and Guards instantly.
+- **Tabbed Interface**: Switch between the standard "Inspector" list and the new "Pulse Tree" dependency graph.
+- **Pulse Tree Visualization**: See your component hierarchy and dependency flow in a collapsible tree view.
+- **Editable Sources**: Click on any Source value to edit it on the fly. Auto-parses JSON and primitives.
 - **Explain API Integration**: Full support for the `guard.explain()` method, showing semantic failure reasons and dependencies.
-- **Glassmorphism Design**: A modern, dark-themed aesthetic that fits seamlessly into developer workflows without obstructing functionality.
-- **Framework-Agnostic**: Built as a standard Web Component, usable in any environment (React, Vue, Svelte, or Vanilla JS).
+- **Draggable & Resizable**: A floating widget that lives anywhere on your screen with intelligent positioning.
+- **Framework-Agnostic**: Built as a standard Web Component, usable in any environment.
 
 ## Installation
 

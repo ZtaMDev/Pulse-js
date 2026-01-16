@@ -13,11 +13,13 @@ export type GuardStatus = 'ok' | 'fail' | 'pending';
 
 /**
  * Structured reason for a guard failure.
+ * Includes toString() so it can be rendered directly in React and other UI frameworks.
  */
 export interface GuardReason {
   code: string;
   message: string;
   meta?: any;
+  toString(): string;
 }
 
 /**
@@ -147,6 +149,34 @@ export interface Guard<T = boolean> {
  * });
  * ```
  */
+/**
+ * Signals that a Guard should fail with a specific reason.
+ * 
+ * @param reason - The reason for failure.
+ * @throws An internal signal error caught by the Guard evaluator.
+ */
+export function guardFail(reason: string | GuardReason): never {
+  const guardReason: GuardReason = typeof reason === 'string' 
+    ? { 
+        code: 'GUARD_FAIL', 
+        message: reason,
+        toString: () => reason
+      }
+    : reason;
+  const err = new Error(guardReason.message);
+  (err as any)._pulseFail = true;
+  (err as any)._reason = guardReason;
+  throw err;
+}
+
+/**
+ * Explicitly signals a successful Guard evaluation.
+ * Returns the value passed to it.
+ */
+export function guardOk<T>(value: T): T {
+  return value;
+}
+
 export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), fn?: () => T | Promise<T>): Guard<T> {
   const name = typeof nameOrFn === 'string' ? nameOrFn : undefined;
   const evaluator = typeof nameOrFn === 'function' ? nameOrFn : fn;
@@ -216,10 +246,18 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
             .catch(err => {
               if (currentId === evaluationId) {
                 persistDependencies();
-                const reason = err instanceof Error ? err.message : String(err);
+                const message = err instanceof Error ? err.message : String(err);
+                const reason: string | GuardReason = err.meta 
+                  ? { 
+                      code: err.code || 'ERROR', 
+                      message,
+                      meta: err.meta,
+                      toString: () => message
+                    }
+                  : message;
                 state = { 
                   status: 'fail', 
-                  reason: err.meta ? { code: err.code || 'ERROR', message: reason, meta: err.meta } : reason, 
+                  reason,
                   lastReason: state.reason || reason,
                   updatedAt: Date.now() 
                 };
@@ -245,13 +283,31 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
     } catch (err: any) {
       node.isEvaluating = false;
       persistDependencies();
-      const reason = err instanceof Error ? err.message : String(err);
-      state = { 
-        status: 'fail', 
-        reason: err.meta ? { code: err.code || 'ERROR', message: reason, meta: err.meta } : reason, 
-        lastReason: reason,
-        updatedAt: Date.now() 
-      };
+      
+      if (err._pulseFail) {
+        state = { 
+          status: 'fail', 
+          reason: err._reason, 
+          lastReason: err._reason,
+          updatedAt: Date.now() 
+        };
+      } else {
+        const message = err instanceof Error ? err.message : String(err);
+        const reason: string | GuardReason = err.meta 
+          ? { 
+              code: err.code || 'ERROR', 
+              message,
+              meta: err.meta,
+              toString: () => message
+            }
+          : message;
+        state = { 
+          status: 'fail', 
+          reason,
+          lastReason: reason,
+          updatedAt: Date.now() 
+        };
+      }
       // Break cycles by notifying failing state
       notifyDependents();
     }
@@ -273,9 +329,6 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
 
 
   const track = () => {
-    if (node.isEvaluating) {
-        throw new Error(`Cyclic guard dependency detected: ${name || 'unnamed guard'}`);
-    }
     const activeGuard = getCurrentGuard();
     if (activeGuard && activeGuard !== node) {
       dependents.add(activeGuard);

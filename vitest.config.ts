@@ -18,11 +18,11 @@ export default defineConfig({
   ] as any[],
   resolve: {
     alias: {
-      "@pulse-js/core": resolve(__dirname, "../src"),
-      "@pulse-js/react": resolve(__dirname, "../packages/react/src"),
-      "@pulse-js/tools": resolve(__dirname, "../packages/tools/src"),
-      "@pulse-js/vue": resolve(__dirname, "../packages/vue/src"),
-      "@pulse-js/svelte": resolve(__dirname, "../packages/svelte/src"),
+      "@pulse-js/core": resolve(__dirname, "./src"),
+      "@pulse-js/react": resolve(__dirname, "./packages/react/src"),
+      "@pulse-js/tools": resolve(__dirname, "./packages/tools/src"),
+      "@pulse-js/vue": resolve(__dirname, "./packages/vue/src"),
+      "@pulse-js/svelte": resolve(__dirname, "./packages/svelte/src"),
     },
   },
   test: {

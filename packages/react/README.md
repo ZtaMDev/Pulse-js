@@ -57,11 +57,21 @@ function ProtectedRoute() {
   }
 
   if (status === "fail") {
-    return <AccessDenied message={reason} />;
+    return <AccessDenied message={formatReason(reason)} />;
   }
 
   return <AdminDashboard />;
 }
+```
+
+### Rendering Failure Reasons
+
+The `reason` property in a `GuardState` can be a string or a `GuardReason` object. To render it safely in JSX, use the `formatReason` helper:
+
+```tsx
+import { formatReason } from "@pulse-js/react";
+
+<p className="error">{formatReason(reason)}</p>;
 ```
 
 ## Developer Tools

@@ -13,7 +13,7 @@ export * from './compute';
 export * from './ssr';
 export * from './registry';
 
-import { guard } from './guard';
+import { guard, guardFail, guardOk } from './guard';
 import { guardExtensions } from './composition';
 
 /**
@@ -30,4 +30,4 @@ import { guardExtensions } from './composition';
  */
 const extendedGuard = Object.assign(guard, guardExtensions);
 
-export { extendedGuard as guard };
+export { extendedGuard as guard, guardFail, guardOk };

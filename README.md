@@ -146,37 +146,23 @@ Compare Pulse primitives:
 | **Guard**   |      ✅      |    ✅     |     ✅     | Business rules (conditioned truths). |
 | **Compute** |      ❌      |    ❌     |     ✅     | Pure transformations (derivations).  |
 
-## API Reference
+## Framework Integrations
 
-### `source<T>(initialValue: T, options?: SourceOptions)`
+Pulse provides official adapters for major frameworks to ensure seamless integration.
 
-Creates a reactive source.
+| Framework  | Package            | Documentation                                                           |
+| :--------- | :----------------- | :---------------------------------------------------------------------- |
+| **React**  | `@pulse-js/react`  | [Read Docs](https://github.com/ZtaMDev/Pulse/tree/main/packages/react)  |
+| **Vue**    | `@pulse-js/vue`    | [Read Docs](https://github.com/ZtaMDev/Pulse/tree/main/packages/vue)    |
+| **Svelte** | `@pulse-js/svelte` | [Read Docs](https://github.com/ZtaMDev/Pulse/tree/main/packages/svelte) |
 
-- `options.name`: Unique string name (highly recommended for debugging).
-- `options.equals`: Custom equality function `(prev, next) => boolean`.
+## Developer Tools
 
-Methods:
+Debug your reactive graph with **[Pulse Tools](https://github.com/ZtaMDev/Pulse/tree/main/packages/tools)**, a powerful framework-agnostic inspector.
 
-- `.set(value: T)`: Updates the value.
-- `.update(fn: (current: T) => T)`: Updates value using a transform.
-- `.subscribe(fn: (value: T) => void)`: Manual subscription.
+### Features
 
-### `guard<T>(name: string, evaluator: () => T | Promise<T>)`
-
-Creates a semantic guard.
-
-Methods:
-
-- `.ok()`: Returns true if status is 'ok'.
-- `.fail()`: Returns true if status is 'fail'.
-- `.pending()`: Returns true if evaluating async.
-- `.reason()`: Returns the failure message.
-- `.state()`: Returns full `{ status, value, reason }` object.
-- `.subscribe(fn: (state: GuardState) => void)`: Manual subscription.
-
----
-
-## Ecosystem
-
-- **@pulse-js/react**: React bindings and hooks.
-- **@pulse-js/tools**: Visual debugging tools.
+- **Component Tree**: Visualize your entire guard dependency graph.
+- **Editable Logic**: Update source values directly from the UI to test logic branches.
+- **Time Travel**: (Coming Soon) Replay state changes.
+- **Zero Config**: Works out of the box with `@pulse-js/tools`.

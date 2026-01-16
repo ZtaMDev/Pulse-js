@@ -37,7 +37,9 @@ export function guardAll(nameOrGuards: string | Guard<any>[], maybeGuards?: Guar
     }
     if (firstFail) {
       // Propagate reason via throw so the parent guard adopts it
-      throw new Error(firstFail.reason() || 'condition failed');
+      const reason = firstFail.reason();
+      const message = typeof reason === 'string' ? reason : (reason?.toString() || 'condition failed');
+      throw new Error(message);
     }
     return true;
   });
@@ -63,7 +65,9 @@ export function guardAny(nameOrGuards: string | Guard<any>[], maybeGuards?: Guar
     let allFails: string[] = [];
     for (const g of guards) {
       if (g.ok()) return true;
-      allFails.push(g.reason() || 'failed');
+      const reason = g.reason();
+      const message = typeof reason === 'string' ? reason : (reason?.toString() || 'failed');
+      allFails.push(message);
     }
     throw new Error(allFails.length > 0 ? allFails.join(' and ') : 'no conditions met');
   });
