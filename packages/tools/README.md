@@ -2,6 +2,10 @@
 
 The official visual debugging suite for the Pulse ecosystem. Inspect, monitor, and debug your reactive graph in real-time with a premium, developer-focused UI.
 
+<div align="center">
+  <img width="383" height="575" alt="image" src="https://github.com/user-attachments/assets/9b557924-3a2d-4558-843f-f8f2793cc2f1" />
+</div>
+
 ## Features
 
 - **Tabbed Interface**: Switch between the standard "Inspector" list and the new "Pulse Tree" dependency graph.
@@ -58,7 +62,7 @@ document.body.appendChild(inspector);
 - **Naming Matters**: Ensure you provide string names to your Sources and Guards (e.g., `source(val, { name: 'my-source' })`). The DevTools rely on these names to provide meaningful debugging information. Unnamed units will appear but are harder to trace.
 - **Status Indicators**:
   - 🟢 **Green**: OK / Active
-  - 🔴 **Red**: Fails (Hover to see semantic failure reasons)
+  - 🔴 **Red**: Fails
   - 🟡 **Yellow**: Pending (Async operations in flight)
 
 ## Architecture
