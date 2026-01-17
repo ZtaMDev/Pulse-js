@@ -211,11 +211,18 @@ describe('Pulse Core', () => {
   describe('Guard Signals', () => {
     it('should support guardFail with custom reasons', () => {
       const g = guard(() => {
-        guardFail({ code: 'CUSTOM', message: 'Something went wrong' });
+        guardFail({ 
+            code: 'CUSTOM', 
+            message: 'Something went wrong', 
+            meta: { userId: 123 },
+            toString: () => 'Something went wrong'
+        });
         return true;
       });
       expect(g.fail()).toBe(true);
-      expect(g.reason()).toEqual({ code: 'CUSTOM', message: 'Something went wrong' });
+      const reason: any = g.reason();
+      expect(reason.code).toBe('CUSTOM');
+      expect(reason.meta.userId).toBe(123);
     });
 
     it('should support guardOk to return value early', () => {
@@ -224,6 +231,39 @@ describe('Pulse Core', () => {
       });
       expect(g.ok()).toBe(true);
       expect(g()).toBe('immediate success');
+    });
+
+    it('should provide full explanation tree', () => {
+      const s1 = source(10, { name: 'param-a' });
+      const s2 = source(20, { name: 'param-b' });
+      
+      const g1 = guard('is-valid-range', () => s1() < 100);
+      const g2 = guard('is-authorized', () => {
+        if (s2() < 50) guardFail('Not enough balance');
+        return true;
+      });
+
+      const root = guard.all('root-check', [g1, g2]);
+      
+      expect(root.fail()).toBe(true);
+      
+      const explanation = root.explain();
+      expect(explanation.name).toBe('root-check');
+      expect(explanation.status).toBe('fail');
+      
+      // Verify dependencies structure
+      expect(explanation.dependencies).toHaveLength(2);
+      
+      const dep0 = explanation.dependencies[0];
+      const dep1 = explanation.dependencies[1];
+      
+      if (!dep0 || !dep1) throw new Error('Dependencies missing from explanation');
+
+      expect(dep0.name).toBe('is-valid-range');
+      expect(dep0.status).toBe('ok');
+      
+      expect(dep1.name).toBe('is-authorized');
+      expect(dep1.status).toBe('fail');
     });
   });
 

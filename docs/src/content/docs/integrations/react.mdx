@@ -1,0 +1,61 @@
+---
+title: React Integration
+description: Using Pulse with React 18+.
+---
+
+The `@pulse-js/react` package provides a seamless integration with React, leveraging `useSyncExternalStore` for concurrent-mode safety.
+
+## Installation
+
+```bash
+npm install @pulse-js/react
+```
+
+## `usePulse` Hook
+
+This is the primary way to consume Pulse state.
+
+### With Sources
+Returns the value and triggers re-render on change.
+
+```tsx
+const count = source(0);
+
+function Counter() {
+  const value = usePulse(count);
+  return <div>{value}</div>;
+}
+```
+
+### With Guards
+Returns a `GuardState` object.
+
+```tsx
+const isAdmin = guard(async () => { ... });
+
+function AdminArea() {
+  const { status, value, reason } = usePulse(isAdmin);
+
+  if (status === 'pending') return <Spinner />;
+  if (status === 'fail') return <Error msg={reason} />;
+  
+  return <Dashboard data={value} />;
+}
+```
+
+## PulseDevTools
+
+You can manually mount the DevTools if you don't want to use the auto-injector.
+
+```tsx
+import { PulseDevTools } from '@pulse-js/react/devtools';
+
+function App() {
+  return (
+    <>
+       <Main />
+       <PulseDevTools shortcut="Ctrl+J" />
+    </>
+  );
+}
+```

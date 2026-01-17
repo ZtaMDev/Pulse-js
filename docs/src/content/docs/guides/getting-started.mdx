@@ -1,0 +1,143 @@
+---
+title: Getting Started
+description: Learn how to install and use Pulse in your application.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+## Installation
+
+Pulse is modular. You can install the core package alone or with framework integrations.
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash 
+    npm install @pulse-js/core @pulse-js/tools 
+    ```
+  </TabItem>
+  <TabItem label="bun">
+    ```bash
+    bun add @pulse-js/core @pulse-js/tools
+    ```
+
+  </TabItem>
+  <TabItem label="pnpm">
+    ```bash 
+    pnpm add @pulse-js/core @pulse-js/tools 
+    ```
+  </TabItem>
+</Tabs>
+
+## Basic Usage
+
+Pulse separates state (Sources) from logic (Guards).
+
+### 1. Create a Source
+
+Sources are simple containers for values.
+
+```ts
+import { source } from "@pulse-js/core";
+
+const name = source("World");
+```
+
+### 2. Create a Guard
+
+Guards track conditions or derived state. They automatically track dependencies.
+
+```ts
+import { guard } from "@pulse-js/core";
+
+const message = guard(() => `Hello, ${name()}!`);
+```
+
+### 3. Use it
+
+You can subscribe to changes or use the value directly.
+
+```ts
+console.log(message()); // "Hello, World!"
+
+name.set("Pulse");
+console.log(message()); // "Hello, Pulse!"
+```
+
+## Framework Integrations
+
+Pulse provides first-class support for major frameworks.
+
+<Tabs>
+  <TabItem label="React"> 
+    ```bash 
+    npm install @pulse-js/react 
+    ```
+    
+    Use the `usePulse` hook to consume Pulse primitives in React components.
+
+    ```tsx
+    import { usePulse } from '@pulse-js/react';
+    import { source } from '@pulse-js/core';
+
+    const count = source(0);
+
+    function Counter() {
+      const value = usePulse(count);
+      return <button onClick={() => count.update(n => n + 1)}>{value}</button>;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```bash 
+    npm install @pulse-js/vue 
+    ```
+    Use `usePulse` to get a reactive Ref.
+
+    
+    ```vue
+    <script setup lang="ts">
+        import { source } from '@pulse-js/core';
+        import { usePulse } from '@pulse-js/vue';
+
+        const count = source(0);
+        // Returns a Ref<number>
+        const countRef = usePulse(count);
+
+        function increment() {
+            count.update(n => n + 1);
+        }
+    </script>
+
+    <template>
+        <div class="source-test">
+            <h2>Source Test</h2>
+            <p>Value: {{ countRef }}</p>
+            <button @click="increment">Increment</button>
+        </div>
+    </template>
+
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```bash 
+    npm install @pulse-js/svelte 
+    ```
+    Use the `$` auto-subscription syntax.
+    ```svelte
+    <script lang="ts">
+        import { source } from "@pulse-js/core";
+        import { usePulse } from "@pulse-js/svelte";
+
+        const count = source(0);
+        const countStore = usePulse(count);
+    </script>
+
+    <section>
+        <h2>Source Test</h2>
+        <p>Value: {$countStore}</p>
+        <button onclick={() => count.update((n) => n + 1)}>Increment</button>
+    </section>
+
+    ```
+  </TabItem>
+</Tabs>

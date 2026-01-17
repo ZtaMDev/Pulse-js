@@ -1,0 +1,51 @@
+---
+title: Async & Race Conditions
+description: Native async handling and automatic race condition prevention.
+---
+
+Pulse treats asynchronous operations as a first-class citizen. You don't need `useEffect` or complex middleware to handle data fetching or async validation.
+
+## Async Guards
+
+A Guard evaluator can be an `async` function.
+
+```ts
+const isServerOnline = guard("check-server", async () => {
+    const res = await fetch("/health");
+    if (!res.ok) throw "Server unreachable";
+    return true;
+});
+```
+
+Pulse automatically manages the lifecycle:
+1. **Pending**: When the promise starts. `isServerOnline.pending()` is `true`.
+2. **OK/Fail**: When the promise resolves or rejects.
+
+## Race Condition Prevention
+
+One of the hardest problems in async UI is **Race Conditions**.
+*Example*: User clicks "Page 1", then quickly "Page 2". "Page 1" request finishes *after* "Page 2" request, overwriting the valid data with stale data.
+
+**Pulse solves this automatically.**
+
+Pulse assigns an internal `runId` to every evaluation. If a dependency changes while a previous async evaluation is still pending (e.g., source changed), the previous evaluation is marked as **stale**.
+
+Even if the stale promise resolves nicely, Pulse **ignores its result**. This ensures that the state always reflects the *latest* version of dependencies.
+
+```ts
+const userId = source(1);
+
+const userData = guard(async () => {
+  const id = userId();
+  return await fetchUser(id);
+});
+
+// 1. Set ID to 1 -> Starts Fetch A
+userId.set(1);
+
+// 2. Immediately Set ID to 2 -> Starts Fetch B
+userId.set(2);
+
+// Fetch A completes. Pulse IGNORES it because ID is already 2.
+// Fetch B completes. Pulse accepts it.
+```

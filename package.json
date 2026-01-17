@@ -18,7 +18,8 @@
   "description": "A semantic reactivity system for modern applications. Separate reactive data (sources) from business conditions (guards) with a declarative, composable, and observable approach.",
   "workspaces": [
     "packages/*",
-    "tests"
+    "tests",
+    "tests/*"
   ],
   "keywords": [
     "reactivity",

@@ -1,0 +1,51 @@
+---
+title: Server-Side Rendering
+description: Isomorphic evaluation and hydration.
+---
+
+Pulse supports Server-Side Rendering (SSR) out of the box. You can evaluate your reactive graph on the server, serialize the result, and "hydrate" it on the client to avoid hydration mismatches or double-fetching.
+
+## Server Side
+
+Use `evaluate` to run specific guards. This waits for any async dependencies to resolve.
+
+```ts
+import { evaluate } from '@pulse-js/core';
+import { isUserAuthenticated, appSettings } from './logic';
+
+export async function render(url) {
+  // 1. Run logic
+  const match = await evaluate([isUserAuthenticated, appSettings]);
+  
+  // 2. Extract state to send to client
+  // You would typically serialize 'match' or inject it into window.__PULSE_STATE__
+  const state = JSON.stringify(match);
+  
+  return `
+    <html>
+      <script>window.__PULSE_STATE__ = ${state}</script>
+      ...
+    </html>
+  `;
+}
+```
+
+## Client Side
+
+Use `hydrate` before your app mounts.
+
+```ts
+import { hydrate } from '@pulse-js/core';
+
+// 1. Restore state
+if (window.__PULSE_STATE__) {
+   hydrate(window.__PULSE_STATE__);
+}
+
+// 2. Mount App
+// Guards will now be in 'ok'/'fail' state immediately without re-running async fetchers
+```
+
+## Reliability
+
+Hydration ensures that async guards do **not** re-execute on the client if they were already resolved on the server. This saves bandwidth and prevents "flicker".

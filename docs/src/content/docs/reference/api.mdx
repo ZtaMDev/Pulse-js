@@ -1,0 +1,49 @@
+---
+title: API Reference
+description: TypeScript definitions for Pulse Core.
+---
+
+## Types
+
+### `PulseUnit<T>`
+Union type for `Source<T> | Guard<T>`.
+
+### `GuardState<T>`
+The current snapshot of a Guard.
+
+```ts
+type GuardState<T> = 
+  | { status: 'pending', value?: T, updatedAt: number }
+  | { status: 'ok', value: T, updatedAt: number }
+  | { status: 'fail', reason: string | GuardReason, lastReason?: string | GuardReason, updatedAt: number };
+```
+
+### `GuardReason`
+Structured error object.
+
+```ts
+interface GuardReason {
+  code?: string;
+  message: string;
+  meta?: Record<string, any>;
+}
+```
+
+## Core Functions
+
+### `source(initialValue, options?)`
+Creates a Source.
+- `options.name`: string (Debugging name)
+
+### `guard(evaluator)`
+Creates a Guard.
+- `evaluator`: `() => boolean | T | Promise<T>`
+
+### `compute(name, dependencies, evaluator)`
+Creates a Computed Value.
+
+### `evaluate(units)`
+**SSR Only**. Resolves a list of units server-side.
+
+### `hydrate(state)`
+**Client Only**. Restores state from server.

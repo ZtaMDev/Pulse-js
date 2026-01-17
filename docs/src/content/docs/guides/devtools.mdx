@@ -1,0 +1,115 @@
+---
+title: Pulse DevTools
+description: Debugging Pulse state visually.
+---
+
+Pulse DevTools provide a powerful visual inspector to debug your reactive graph. It allows you to see all Sources, Guards, and Computeds, their current values, and how they relate to each other.
+
+![DevTools Screenshot](../../../assets/devtools-screenshot.png)
+
+## Installation
+
+```bash
+npm install @pulse-js/tools
+```
+
+## Quick Start (React)
+
+The easiest way to use DevTools in React is via the auto-injector. This will automatically inject the inspector when your app is running in `development` mode.
+
+```ts
+// main.tsx
+import '@pulse-js/react/devtools';
+```
+
+## Manual Usage (Web Component)
+
+Pulse DevTools are built as a standard Web Component, making them compatible with any framework or Vanilla JS.
+
+```html
+<script type="module" src="@pulse-js/tools"></script>
+
+<pulse-inspector shortcut="Ctrl+J"></pulse-inspector>
+```
+
+### Attributes
+
+| Attribute | Description | Default |
+| :--- | :--- | :--- |
+| `shortcut` | Key combination to toggle visibility. | `Ctrl+J` |
+| `theme` | UI theme (`dark` or `light`). | `dark` |
+
+## Framework-Specific Integration
+
+### React
+
+If you want more control, you can use the `PulseDevTools` component.
+
+```tsx
+import { PulseDevTools } from '@pulse-js/react/devtools';
+
+function App() {
+  return (
+    <>
+      <PulseDevTools shortcut="Shift+D" />
+      <MyAppComponent />
+    </>
+  );
+}
+```
+
+### Vue
+
+Import the tool in your main entry point and use the tag in your root component.
+
+```vue
+<!-- App.vue -->
+<script setup>
+import '@pulse-js/tools';
+</script>
+
+<template>
+  <pulse-inspector />
+  <router-view />
+</template>
+```
+
+> **Vite Configuration**: You must tell the Vue compiler that `pulse-inspector` is a custom element to avoid warnings.
+
+```ts
+// vite.config.ts
+export default defineConfig({
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === 'pulse-inspector'
+        }
+      }
+    })
+  ]
+})
+```
+
+### Svelte
+
+Import once at the top level.
+
+```svelte
+<!-- App.svelte -->
+<script>
+  import '@pulse-js/tools';
+</script>
+
+<pulse-inspector />
+<main>...</main>
+```
+
+> Svelte handles custom elements natively. If you encounter issues with Svelte 5 runes mode, ensure you are importing the tools at the very top of your entry file.
+
+## Why use DevTools?
+
+- **Real-time Inspection**: See values change as you interact with the app.
+- **Dependency Tracking**: Understand *why* a guard failed by looking at its dependencies.
+- **Semantic Errors**: View the full `reason` and `meta` objects of failing guards.
+- **SSR Hydration Check**: Verify that server-side state was correctly restored on the client.

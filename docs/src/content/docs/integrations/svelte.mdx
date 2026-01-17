@@ -1,0 +1,72 @@
+---
+title: Svelte Integration
+description: Using Pulse with Svelte.
+---
+
+@pulse-js/svelte adapts Pulse primitives into Svelte Stores, allowing usage of the `$` auto-subscription syntax.
+
+## Installation
+
+```bash
+npm install @pulse-js/svelte
+```
+
+## `usePulse`
+
+### With Sources
+Returns a Svelte Store that you can auto-subscribe to using the `$` prefix.
+
+```svelte
+<script lang="ts">
+  import { source } from "@pulse-js/core";
+  import { usePulse } from "@pulse-js/svelte";
+
+  const count = source(0);
+  const countStore = usePulse(count);
+</script>
+
+<section>
+  <p>Value: {$countStore}</p>
+  <button onclick={() => count.update(n => n + 1)}>Increment</button>
+</section>
+```
+
+### With Guards
+Returns a Store containing the `GuardState`.
+
+```svelte
+<script lang="ts">
+  import { guard, guardFail, source } from "@pulse-js/core";
+  import { usePulse } from "@pulse-js/svelte";
+
+  const age = source(15);
+  const ageStore = usePulse(age);
+
+  const isAdult = guard("is-adult", () => {
+    if (age() < 18) guardFail("Not an adult");
+    return true;
+  });
+
+  const stateStore = usePulse(isAdult);
+</script>
+
+<section>
+  <p>Current Age: {$ageStore}</p>
+  <div>
+    <button onclick={() => age.set(15)}>Set 15</button>
+    <button onclick={() => age.set(20)}>Set 20</button>
+  </div>
+
+  {#if $stateStore.status === "ok"}
+    <div style="color: green">
+      <h3>✅ Allowed</h3>
+      <p>Value: {$stateStore.value}</p>
+    </div>
+  {:else if $stateStore.status === "fail"}
+    <div style="color: red">
+      <h3>❌ Blocked</h3>
+      <p>Reason: {$stateStore.reason}</p>
+    </div>
+  {/if}
+</section>
+```

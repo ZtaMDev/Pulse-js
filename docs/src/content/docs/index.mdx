@@ -1,0 +1,151 @@
+---
+title: Pulse-JS
+description: A semantic reactivity system for modern applications.
+template: splash
+hero:
+  tagline: Separate reactive data from business conditions with a declarative, composable, and observable approach.
+  image:
+    file: ../../assets/pulse.svg
+  actions:
+    - text: Get Started
+      link: /guides/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/ZtaMDev/pulse-js
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<div class="hero-intro">
+  Pulse differs from traditional signals or state managers by treating **Conditions** as first-class citizens. Instead of embedding complex boolean logic inside components, you define **Semantic Guards** that can be observed, composed, and debugged independently.
+</div>
+
+## Core Primitives
+
+<CardGrid>
+	<Card title="Sources" icon="puzzle">
+        **Refined Data Containers**
+        Sources hold your application's primitive state. They notify dependents when values change.
+        
+        ```ts
+        const user = source({ name: "Alice", id: 1 });
+        user.set({ name: "Bob", id: 1 });
+        ```
+	</Card>
+	<Card title="Semantic Guards" icon="approve-check-circle">
+        **First-Class Conditions**
+		Guards represent business rules. They track their own `status` (ok, fail, pending) and `reason`.
+        
+        ```ts
+        const isAdmin = guard("is-admin", () => {
+           if (user().role !== "admin") return false;
+           return true; 
+        });
+        ```
+	</Card>
+    <Card title="Computed Values" icon="random">
+        **Pure Transformations**
+        Derive new data from sources or other guards with memoization.
+        
+        ```ts
+        const fullName = compute("full-name", [user], (u) => {
+            return `${u.first} ${u.last}`;
+        });
+        ```
+	</Card>
+    <Card title="Logic Composition" icon="list-format">
+        **Declarative Combinators**
+        Combine guards using built-in logical helpers like `all`, `any`, and `not`.
+
+        ```ts
+        const canLaunch = guard.all([
+            isSystemReady,
+            isUserAuthorized,
+            guard.not(isMaintenanceMode)
+        ]);
+        ```
+    </Card>
+</CardGrid>
+
+## Enterprise Features
+
+<CardGrid>
+	<Card title="Async & Race Control" icon="star">
+		**Native Async Support**
+        Guards handle promises natively. Pulse implements internal versioning to automatically cancel stale evaluations, preventing race conditions.
+
+        ```ts
+        const isServerOnline = guard("check-server", async () => {
+             const res = await fetch("/health");
+             if (!res.ok) throw "Server unreachable";
+             return true;
+        });
+        ```
+	</Card>
+    <Card title="Explainable Logic" icon="magnifier">
+		**Structured Debugging**
+        Call `.explain()` to get a structured tree of the current status, failure reasons, and dependencies.
+
+        ```ts
+        const explanation = canCheckout.explain();
+        // { status: 'fail', reason: 'auth failed', ... }
+        ```
+	</Card>
+    <Card title="Server-Side Rendering" icon="laptop">
+		**Isomorphic Design**
+        Use `evaluate()` on the server to serialize state and `hydrate()` on the client to resume seamlessly.
+	</Card>
+</CardGrid>
+
+## Ecosystem
+
+<CardGrid>
+  <Card title="React Integration" icon="star">
+    **Concurrent Mode Compatible**
+    `@pulse-js/react` uses `useSyncExternalStore` for safe concurrent updates.
+    
+    ```ts
+    const { status, reason } = usePulse(isAdmin);
+    ```
+  </Card>
+  <Card title="Vue & Svelte" icon="rocket">
+    **Multi-Framework Support**
+    First-class adapters available for other major frameworks.
+    
+    ```ts
+    import { usePulse } from '@pulse-js/vue';
+    import { usePulse } from '@pulse-js/svelte';
+    ```
+  </Card>
+</CardGrid>
+
+import devtoolsScreenshot from '../../assets/devtools-screenshot.png';
+
+<div class="devtools-layout">
+  <Card title="Pulse Tools" icon="setting">
+    **Framework Agnostic Inspector**
+    Visualize dependency graphs, edit sources, and inspect logical failures in real-time.
+
+    **React (Auto)**
+    ```ts
+    import '@pulse-js/react/devtools'; 
+    ```
+
+    **React (Manual Config)**
+    ```tsx
+    import { PulseDevTools } from '@pulse-js/react/devtools';
+    <PulseDevTools shortcut="Ctrl+J" />
+    ```
+
+    **Vanilla JS (Web Component)**
+    ```html
+    <pulse-inspector shortcut="Ctrl+J"></pulse-inspector>
+    ```
+  </Card>
+  <div class="devtools-image-container">
+    <img src={devtoolsScreenshot.src} alt="Pulse DevTools Interface" />
+  </div>
+</div>

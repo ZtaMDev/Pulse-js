@@ -1,0 +1,62 @@
+---
+title: Sources
+description: The fundamental unit of state in Pulse.
+---
+
+Sources are the primitive containers for your application state. They hold values and notify dependents when those values change. Unlike other signals libraries, Pulse Sources are designed to be "dumb" data containers—they don't hold logic, only facts.
+
+## Creating a Source
+
+Use the `source()` function to create a new reactive unit.
+
+```ts
+import { source } from '@pulse-js/core';
+
+// Primitive
+const count = source(0);
+
+// Object
+const user = source({ name: 'Alice', id: 1 });
+```
+
+### Naming (Optional but Recommended)
+You can provide a name as the second argument. This is crucial for debugging with Pulse Tools.
+
+```ts
+const count = source(0, { name: 'global-count' });
+```
+
+## API Reference
+
+### `source()`
+Returns a getter function. Calling the getter inside a Guard or Computed automatically tracks the dependency.
+
+```ts
+const value = count(); // Read value
+```
+
+### `.set(newValue)`
+Updates the value and notifies all subscribers.
+
+```ts
+count.set(5);
+```
+
+### `.update(fn)`
+Updates the value based on the previous state.
+
+```ts
+count.update(n => n + 1);
+```
+
+### `.subscribe(fn)`
+Listen for changes manually. Returns an unsubscribe function.
+
+```ts
+const unsub = count.subscribe(val => {
+  console.log('New value:', val);
+});
+
+// Later
+unsub();
+```

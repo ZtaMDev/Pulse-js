@@ -1,0 +1,119 @@
+---
+title: Guards
+description: Semantic conditions and business logic.
+---
+
+Guards are the heart of Pulse. They represent **Conditioned Truths** or business rules. Unlike simple computed values, Guards track their own `status` (`ok`, `fail`, `pending`) and explicit failure `reason`.
+
+## The Problem
+In traditional state management, you often handle "loading", "error", and "success" states manually with separate variables.
+
+```ts
+// The old way
+let isLoading = false;
+let error = null;
+let data = null;
+```
+
+## The Pulse Way
+A Guard encapsulates all of this.
+
+```ts
+import { guard } from '@pulse-js/core';
+
+const isAuthorized = guard('auth-check', async () => {
+  const user = currentUser(); 
+  if (!user) throw 'Not logged in';
+  if (user.role !== 'admin') return false; // Fail
+  return true; // OK
+});
+```
+
+## Guard States
+
+1. **OK**: The evaluator returned a truthy value (or `true`).
+2. **FAIL**: The evaluator returned `false` or threw an error.
+3. **PENDING**: The evaluator returned a Promise that is currently resolving, or returned `undefined`.
+
+## API Reference
+
+### `.ok()`
+Returns `true` if the last evaluation was successful.
+
+### `.fail()`
+Returns `true` if the last evaluation failed.
+
+### `.pending()`
+Returns `true` if the guard is currently evaluating (async).
+
+### `.reason()`
+Returns the reason for the failure. This can be a string or a structured object.
+
+```ts
+if (isAuthorized.fail()) {
+  console.error(isAuthorized.reason()); // "Not logged in"
+}
+```
+
+## Advanced Control Flow
+
+Sometimes returning `false` isn't enough. You might want to fail with a specific error code or return early.
+
+### `guardFail(reason)`
+
+Import `guardFail` to stop execution immediately and mark the guard as failed.
+
+```ts
+import { guard, guardFail } from '@pulse-js/core';
+
+const userCheck = guard(() => {
+    if (!user) {
+        // Fail with structure
+        guardFail({ 
+            code: 'AUTH_REQUIRED', 
+            message: ' User must be logged in',
+            meta: { redirect: '/login' }
+        });
+    }
+    return true;
+});
+```
+
+### `guardOk(value)`
+
+Return early with a success value.
+
+```ts
+import { guard, guardOk } from '@pulse-js/core';
+
+const check = guard(() => {
+    if (cache.has(key)) return guardOk(cache.get(key));
+    // ... expensive logic
+    return result;
+});
+```
+
+## Debugging
+
+### `.explain()`
+Returns a complete snapshot of the guard's state and its recursive dependency tree. This is invaluable for debugging why a complex chain of guards failed.
+
+```ts
+const explanation = canPlaceOrder.explain();
+console.log(explanation);
+
+/* Output:
+{
+  name: 'can-place-order',
+  status: 'fail',
+  reason: 'Not enough balance',
+  dependencies: [
+    { name: 'has-items', status: 'ok' },
+    { name: 'sufficient-balance', status: 'fail' } 
+  ]
+}
+*/
+```
+
+### `.state()`
+Returns the raw internal state object (`{ status, value, reason, updatedAt }`).

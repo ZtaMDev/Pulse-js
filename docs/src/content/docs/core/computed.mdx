@@ -1,0 +1,36 @@
+---
+title: Computed Values
+description: Pure data transformations.
+---
+
+Computed values (`compute`) are for **derivations**. Use them when you want to transform data without the semantic overhead of "success" or "failure" that Guards provide.
+
+## Usage
+
+Computes take a name, a list of dependencies, and a transform function.
+
+```ts
+import { source, compute } from '@pulse-js/core';
+
+const firstName = source('Alice');
+const lastName = source('Smith');
+
+const fullName = compute('full-name', [firstName, lastName], (first, last) => {
+  return `${first} ${last}`; // "Alice Smith"
+});
+```
+
+## Characteristics
+
+- **Memoized**: They only re-calculate when inputs change.
+- **Pure**: They should not have side effects.
+- **Observable**: You can subscribe to them or use them in Guards.
+
+## When to use Compute vs Guard?
+
+| Feature | Compute (`compute`) | Guard (`guard`) |
+| :--- | :--- | :--- |
+| **Purpose** | Data Transformation | Business Logic / Validation |
+| **Return Type** | Any Value | Boolean/Promise (mostly) |
+| **Has Status?** | No | Yes (`ok`, `fail`, `pending`) |
+| **Has Reason?** | No | Yes |

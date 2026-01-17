@@ -1,0 +1,52 @@
+---
+title: Logic Composition
+description: Declarative ways to combine guards.
+---
+
+Pulse encourages building small, atomic logic units and composing them into larger rules. This keeps your business logic testable and readable.
+
+## `guard.all(name, [guards])`
+
+Passes only if **ALL** provided guards have a status of `ok`.
+If any guard fails, the composed guard fails with the reason of the *first* failing dependency.
+
+```ts
+const canLaunch = guard.all('can-launch', [
+  isSystemReady,
+  isFuelFull,
+  isClearWeather
+]);
+```
+
+## `guard.any(name, [guards])`
+
+Passes if **AT LEAST ONE** guard has a status of `ok`.
+
+```ts
+const hasAccess = guard.any('access-allowed', [
+  isAdmin,
+  isOwner,
+  hasGuestPass
+]);
+```
+
+## `guard.not(name, guard)`
+
+Inverts the status of the target guard.
+- If target is `ok` -> `guard.not` is `fail`.
+- If target is `fail` -> `guard.not` is `ok`.
+
+```ts
+const isLocked = guard.not('is-locked', isOpen);
+```
+
+## Nesting
+
+Because these composed units are just standard Guards, you can nest them infinitely.
+
+```ts
+const canDelete = guard.all('can-delete', [
+   isAuthenticated,
+   guard.any('permission', [isAdmin, isOwner])
+]);
+```

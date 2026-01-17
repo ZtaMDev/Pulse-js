@@ -1,0 +1,126 @@
+:root {
+  /* Brand Colors (Pulse Blue/Cyan) */
+  --sl-hue-accent: 200;
+  --sl-color-accent-light: #e0f2fe;
+  --sl-color-accent: #0ea5e9;
+  --sl-color-accent-dark: #0284c7;
+  --sl-color-accent-high: #bae6fd;
+  --sl-color-accent-low: #0c4a6e;
+}
+
+/* Hero Section Enhancements */
+.hero {
+  padding-bottom: 4rem !important;
+  position: relative;
+  overflow: visible;
+}
+
+.hero::before {
+	content: "";
+	position: absolute;
+	top: -10%;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 120%;
+	height: 150%;
+	background: radial-gradient(ellipse at center, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+	z-index: -1;
+	pointer-events: none;
+}
+
+/* Glow behind the logo */
+.hero img {
+  filter: drop-shadow(0 0 50px rgba(14, 165, 233, 0.4));
+  animation: pulse-glow 4s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from {
+    filter: drop-shadow(0 0 30px rgba(14, 165, 233, 0.3));
+    transform: scale(0.98);
+  }
+  to {
+    filter: drop-shadow(0 0 60px rgba(14, 165, 233, 0.6));
+    transform: scale(1.02);
+  }
+}
+
+/* Feature Cards */
+.card-grid {
+  gap: 1.5rem;
+}
+
+/* Introductory Text */
+.hero-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 3rem auto;
+    font-size: 1.25rem;
+    line-height: 1.75;
+    color: var(--sl-color-gray-2);
+}
+
+.card {
+  border: 1px solid var(--sl-color-gray-5);
+  background: var(--sl-color-black); /* fallback */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+/* DevTools Split Layout */
+.devtools-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    align-items: stretch;
+}
+
+.devtools-image-container {
+    border: 1px solid var(--sl-color-gray-5);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.devtools-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .devtools-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card:hover {
+  border-color: var(--sl-color-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(14, 165, 233, 0.2);
+}
+
+.card .title {
+  font-weight: 700;
+  color: var(--sl-color-white);
+}
+
+/* Navbar "Docs" Button Simulation */
+.site-title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Custom "Badge" style for version */
+.sl-badge {
+  background-color: var(--sl-color-accent-low);
+  color: var(--sl-color-accent-light);
+  border: 1px solid var(--sl-color-accent);
+}
