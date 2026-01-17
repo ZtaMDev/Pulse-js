@@ -5,6 +5,7 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://ztamdev.github.io/pulse-js',
+	base: '/pulse-js',
 	integrations: [
 		starlight({
 			title: 'Pulse-JS',
