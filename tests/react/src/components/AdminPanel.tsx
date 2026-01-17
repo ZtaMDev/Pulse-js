@@ -1,10 +1,10 @@
-import { guard } from '@pulse-js/core';
+import { guard, source } from '@pulse-js/core';
 import { usePulse } from '@pulse-js/react';
 import { useState } from 'react';
 
 // Mock API state
 let mockUser: any = null;
-
+let exmp = source(0);
 // Mock fetch to simulate the user's logic
 const mockFetch = async (url: string) => {
   await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network lag

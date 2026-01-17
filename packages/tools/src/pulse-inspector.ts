@@ -1,4 +1,3 @@
-
 import { PulseRegistry, type PulseUnit } from '@pulse-js/core';
 
 // --- STYLES & THEME ---
@@ -231,7 +230,10 @@ class PulseInspector extends HTMLElement {
     if (valueEl) {
       const name = valueEl.getAttribute('data-name');
       const unit = this.units.find(u => (u as any)._name === name);
-      if (unit && !('state' in unit)) { // Only sources
+      // Only sources AND must have a name to be editable (names are used for tracking)
+      const hasName = (unit as any)._name && (unit as any)._name !== 'unnamed';
+      
+      if (unit && !('state' in unit) && hasName) {
         this.editingUnit = unit;
         this.editValue = JSON.stringify((unit as any)());
         this.render();
@@ -397,10 +399,13 @@ class PulseInspector extends HTMLElement {
               <input class="edit-input" value='${this.safeStringify(value)}' />
             </form>
           ` : `
-            <div class="value-row ${!isGuard ? 'editable-value' : ''}" data-name="${name}" title="${!isGuard ? 'Click to edit' : ''}">
+            <div class="value-row ${(!isGuard && name !== 'unnamed') ? 'editable-value' : ''}" 
+                 data-name="${name}" 
+                 title="${!isGuard ? (name === 'unnamed' ? 'Unnamed sources cannot be edited (not trackable)' : 'Click to edit') : ''}">
               <span style="opacity:0.5;margin-right:6px">Value:</span> 
               <span class="value-text">${this.formatValue(value)}</span>
-              ${!isGuard ? `<span class="edit-icon">${ICONS.edit}</span>` : ''}
+              ${(!isGuard && name !== 'unnamed') ? `<span class="edit-icon">${ICONS.edit}</span>` : ''}
+              ${(!isGuard && name === 'unnamed') ? `<span style="opacity:0.3;font-size:10px;margin-left:auto">🔒 Locked</span>` : ''}
             </div>
           `}
 
@@ -416,12 +421,6 @@ class PulseInspector extends HTMLElement {
   }
 
   private renderTree() {
-    // 1. Identify Roots (Guards that are not dependencies of any other guard)
-    // Actually, showing all guards as roots is messy.
-    // Let's show specific "Roots" or just list all top-level guards.
-    // Ideally we filter out guards that are purely internal dependencies, but Pulse doesn't distinct them yet.
-    // For now, we list all Guards at the top level, and they expand to show their deps.
-    
     const guards = this.units.filter(u => 'state' in u);
     
     if (guards.length === 0) return `<div class="empty-state">No Guards to visualize.</div>`;

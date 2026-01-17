@@ -3,7 +3,7 @@ title: Svelte Integration
 description: Using Pulse with Svelte.
 ---
 
-@pulse-js/svelte adapts Pulse primitives into Svelte Stores, allowing usage of the `$` auto-subscription syntax.
+@pulse-js/svelte provides a native experience for **Svelte 5 Runes** while maintaining backward compatibility with **Svelte stores**.
 
 ## Installation
 
@@ -11,81 +11,69 @@ description: Using Pulse with Svelte.
 npm install @pulse-js/svelte
 ```
 
-## `usePulse`
+## Svelte 5 Runes (Recommended)
 
-### With Sources
-Returns a Svelte Store that you can auto-subscribe to using the `$` prefix.
+When used in Svelte 5, Pulse primitives behave like standard Runes ($state, $derived).
+
+### `usePulse` with Sources
+
+Returns a reactive object with a `.value` property.
 
 ```svelte
 <script lang="ts">
   import { source } from "@pulse-js/core";
   import { usePulse } from "@pulse-js/svelte";
 
-  const count = source(0);
-  const countStore = usePulse(count);
+  const countSource = source(0);
+  const count = usePulse(countSource);
 </script>
 
-<section>
-  <p>Value: {$countStore}</p>
-  <button onclick={() => count.update(n => n + 1)}>Increment</button>
-</section>
+<button onclick={() => countSource.update(n => n + 1)}>
+  Count: {count.value}
+</button>
 ```
 
-### With Guards
-Returns a Store containing the `GuardState`.
+### `usePulse` with Guards
 
-```svelte
-<script lang="ts">
-  import { guard, guardFail, source } from "@pulse-js/core";
-  import { usePulse } from "@pulse-js/svelte";
-
-  const age = source(15);
-  const ageStore = usePulse(age);
-
-  const isAdult = guard("is-adult", () => {
-    if (age() < 18) guardFail("Not an adult");
-    return true;
-  });
-
-  const stateStore = usePulse(isAdult);
-</script>
-
-<section>
-  <p>Current Age: {$ageStore}</p>
-  <div>
-    <button onclick={() => age.set(15)}>Set 15</button>
-    <button onclick={() => age.set(20)}>Set 20</button>
-  </div>
-
-  {#if $stateStore.status === "ok"}
-    <div style="color: green">
-      <h3>✅ Allowed</h3>
-      <p>Value: {$stateStore.value}</p>
-    </div>
-  {:else if $stateStore.status === "fail"}
-    <div style="color: red">
-      <h3>❌ Blocked</h3>
-      <p>Reason: {$stateStore.reason}</p>
-    </div>
-  {/if}
-</section>
-```
-
-## `useGuard`
-
-An alias for `usePulse(guard)` that returns a Svelte Store containing the `GuardState`.
+Returns a reactive `GuardState` lookalike that you can use directly in your template.
 
 ```svelte
 <script lang="ts">
   import { useGuard } from "@pulse-js/svelte";
-  import { isAdult } from "./guards";
+  import { authGuard } from "./logic";
 
-  const state = useGuard(isAdult);
+  const state = useGuard(authGuard);
 </script>
 
-{#if $state.status === "ok"}
-  <p>Access Granted</p>
-{:else if $state.status === "fail"}
-  <p>Denied: {$state.reason}</p>
+{#if state.status === "ok"}
+  <p>Welcome, {state.value.name}</p>
+{:else if state.status === "fail"}
+  <p style="color: red">Error: {state.reason}</p>
 {/if}
+```
+
+## Legacy Svelte Stores
+
+If you are using **Svelte 4** or prefer the store syntax (`$variable`), use `usePulseStore`.
+
+```svelte
+<script lang="ts">
+  import { usePulseStore } from "@pulse-js/svelte";
+  const count = usePulseStore(mySource);
+</script>
+
+<p>Value: {$count}</p>
+```
+
+## Vite Configuration
+
+For Svelte 5, you must ensure that Vite correctly resolves the client-side version of Svelte. Add the following to your `vite.config.ts`:
+
+```ts
+export default defineConfig({
+  // ...
+  resolve: {
+    conditions: ['browser', 'module', 'jsnext:main', 'jsnext']
+  }
+})
 ```

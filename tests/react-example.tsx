@@ -4,7 +4,6 @@ import { usePulse, formatReason, useGuard } from '@pulse-js/react';
 // 1. Logic (Outside Component)
 const user = source<any>(null, { name: 'user' });
 const balance = source(100, { name: 'balance' });
-
 const isLoggedIn = guard('auth', () => !!user());
 const hasBalance = guard('has-balance', () => balance() >= 150);
 

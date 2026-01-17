@@ -8,4 +8,7 @@ export default defineConfig({
       runes: true
     }
   })],
+  resolve: {
+    conditions: ['browser', 'module', 'jsnext:main', 'jsnext']
+  }
 })
