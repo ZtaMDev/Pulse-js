@@ -1,24 +1,26 @@
 {
   "name": "@pulse-js/svelte",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
+  "main": "dist/index.svelte.cjs",
+  "module": "dist/index.svelte.js",
   "svelte": "src/index.svelte.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.svelte.d.ts",
       "svelte": "./src/index.svelte.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.svelte.js",
+      "require": "./dist/index.svelte.cjs",
+      "default": "./dist/index.svelte.js"
     }
   },
-  "types": "dist/index.d.ts",
+  "types": "dist/index.svelte.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build": "bun x tsup src/index.svelte.ts --entry.index=src/index.svelte.ts --format esm,cjs --clean --dts --external svelte,@pulse-js/core",
+    "build": "bun x tsup src/index.svelte.ts --format esm,cjs --clean --dts --external svelte,@pulse-js/core",
     "lint": "bun x tsc --noEmit"
   },
   "peerDependencies": {
