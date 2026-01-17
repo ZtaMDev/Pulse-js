@@ -1,0 +1,48 @@
+---
+import type { Props } from "@astrojs/starlight/props";
+import Default from "@astrojs/starlight/components/SiteTitle.astro";
+---
+
+<div class="site-title-container">
+  <Default {...Astro.props} />
+  <a href="/changelog/v018" class="version-badge"> v0.1.8 </a>
+</div>
+
+<style is:global>
+  .site-title-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Style the actual text inside Starlight's SiteTitle */
+  .site-title {
+    font-weight: 900 !important;
+    font-size: 1.5rem !important;
+    background: linear-gradient(
+      135deg,
+      var(--sl-color-text-accent) 0%,
+      #ffffff 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+
+  .version-badge {
+    background-color: var(--sl-color-text-accent);
+    color: var(--sl-color-bg);
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.15rem 0.4rem;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    opacity: 0.9;
+  }
+  .version-badge:hover {
+    transform: translateY(-1px);
+    opacity: 1;
+    box-shadow: 0 2px 8px var(--sl-color-text-accent-low);
+  }
+</style>

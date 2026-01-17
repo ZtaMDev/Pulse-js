@@ -12,12 +12,15 @@ export default defineConfig({
 		starlight({
 			title: 'Pulse-JS',
 			favicon: '/favicon.svg',
-			logo: {
-				src: './src/assets/pulse.svg',
-			},
+
             customCss: [
                 './src/styles/custom.css',
             ],
+			components: {
+				Footer: './src/components/CustomFooter.astro',
+				SiteTitle: './src/components/CustomSiteTitle.astro',
+				SocialIcons: './src/components/CustomSocialIcons.astro',
+			},
 			social: [
 				{ label: 'GitHub', icon: 'github', href: 'https://github.com/ZtaMDev/pulse-js' },
 			],
@@ -56,6 +59,10 @@ export default defineConfig({
 				{
 					label: 'Reference',
 					autogenerate: { directory: 'reference' },
+				},
+				{
+					label: 'Changelog',
+					autogenerate: { directory: 'changelog' },
 				},
 			],
 		}),

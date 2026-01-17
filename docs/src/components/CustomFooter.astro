@@ -1,0 +1,45 @@
+---
+import type { Props } from "@astrojs/starlight/props";
+import Default from "@astrojs/starlight/components/Footer.astro";
+---
+
+<footer class="custom-footer">
+  <div class="footer-content">
+    <p>Licensed under <strong>MIT</strong></p>
+    <p>
+      Pulse-JS Core Maintainer:
+      <a
+        href="https://github.com/ZtaMDev"
+        target="_blank"
+        rel="noopener noreferrer">ZMDev</a
+      >
+    </p>
+  </div>
+  <Default {...Astro.props} />
+</footer>
+
+<style>
+  .custom-footer {
+    margin-top: 3rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--sl-color-hairline);
+  }
+  .footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .footer-content p {
+    margin: 0;
+  }
+  .footer-content a {
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+  }
+  .footer-content a:hover {
+    text-decoration: underline;
+  }
+</style>

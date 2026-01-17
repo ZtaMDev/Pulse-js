@@ -1,0 +1,46 @@
+---
+import type { Props } from "@astrojs/starlight/props";
+import Default from "@astrojs/starlight/components/SocialIcons.astro";
+---
+
+<div class="header-right-actions">
+  <a href="/guides/getting-started" class="docs-nav-link">Docs</a>
+  <div class="social-divider"></div>
+  <Default {...Astro.props} />
+</div>
+
+<style>
+  .header-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .docs-nav-link {
+    text-decoration: none;
+    color: var(--sl-color-text);
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .docs-nav-link:hover {
+    background-color: var(--sl-color-gray-5);
+    color: var(--sl-color-text-accent);
+  }
+
+  .social-divider {
+    width: 1px;
+    height: 1.25rem;
+    background-color: var(--sl-color-gray-5);
+  }
+
+  @media (max-width: 50rem) {
+    .social-divider,
+    .docs-nav-link {
+      display: none;
+    }
+  }
+</style>
