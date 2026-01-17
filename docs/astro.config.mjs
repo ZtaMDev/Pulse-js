@@ -5,7 +5,7 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://pulse-js-docs.vercel.app',
+	site: 'https://pulse-js.vercel.app',
 	output: 'static',
 	adapter: vercel(),
 	integrations: [
