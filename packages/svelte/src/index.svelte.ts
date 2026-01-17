@@ -17,9 +17,9 @@ import type { Guard, Source, GuardState } from '@pulse-js/core';
  * - For Sources: Returns a stable object { value: T } where .value is reactive.
  * - For Guards: Returns a proxy that behaves like the GuardState, but is reactive to updates.
  */
-export function usePulse<T>(unit: Source<T>): { value: T };
 export function usePulse<T>(unit: Guard<T>): GuardState<T>;
-export function usePulse<T>(unit: Guard<T> | Source<T>): any {
+export function usePulse<T>(unit: Source<T>): { value: T };
+export function usePulse<T>(unit: any): any {
   const isGuard = unit !== null && typeof unit === 'function' && 'state' in unit;
 
   if (isGuard) {

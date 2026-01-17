@@ -27,7 +27,7 @@
     },
     "packages/react": {
       "name": "@pulse-js/react",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "dependencies": {
         "@pulse-js/core": "^0.1.8",
         "@pulse-js/tools": "^0.1.5",
@@ -43,7 +43,7 @@
     },
     "packages/svelte": {
       "name": "@pulse-js/svelte",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@pulse-js/core": "^0.1.8",
       },
@@ -58,7 +58,7 @@
     },
     "packages/tools": {
       "name": "@pulse-js/tools",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "dependencies": {
         "@pulse-js/core": "^0.1.8",
       },
@@ -82,6 +82,10 @@
       "name": "pulse-examples",
       "version": "0.0.0",
       "dependencies": {
+        "@pulse-js/core": "latest",
+        "@pulse-js/react": "latest",
+        "@pulse-js/svelte": "latest",
+        "@pulse-js/vue": "latest",
         "react": "^19.2.3",
         "react-dom": "^19.2.3",
       },
@@ -955,6 +959,12 @@
     "editorconfig/minimatch": ["minimatch@9.0.1", "", { "dependencies": { "brace-expansion": "^2.0.1" } }, "sha512-0jWhJpD/MdhPXwPuiRkCbfYfSKp2qnn2eOc279qI7f+osl/l+prKSrvhg157zSYvx/1nmgn2NqdT6k2Z7zSH9w=="],
 
     "path-scurry/lru-cache": ["lru-cache@10.4.3", "", {}, "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ=="],
+
+    "pulse-examples/@pulse-js/react": ["@pulse-js/react@0.1.6", "", { "dependencies": { "@pulse-js/core": "^0.1.8", "@pulse-js/tools": "^0.1.6" }, "peerDependencies": { "react": "^19.2.3" } }, "sha512-1paVAvbpaFPc7XcfiV2TbSf3nbjL5fN62kxtsjAqnk6P7Uqpt96m4u5YGwuAMsJJdqYk+BUPnvu2qzscd3D0wQ=="],
+
+    "pulse-examples/@pulse-js/svelte": ["@pulse-js/svelte@0.1.1", "", { "dependencies": { "@pulse-js/core": "^0.1.8" }, "peerDependencies": { "svelte": "^4.0.0 || ^5.0.0" } }, "sha512-21qVjPPE0jPzJ+2NpSnaTB3HFB7uaMidCZABClcnz30itlmg6JyAbxWDWkJ6ZQvy1yPhfM8b9gwiT64WkWH9oA=="],
+
+    "pulse-examples/@pulse-js/vue": ["@pulse-js/vue@0.1.0", "", { "dependencies": { "@pulse-js/core": "^0.1.8" }, "peerDependencies": { "vue": "^3.5.0" } }, "sha512-IwCYy73Zx6sb/adjthuM5Qekh3T5ljfZ2z3WF1vlYFPLseQ++VTyZ0i6ocLBBBuRYX6rMOKEVgNzIhUmnv0Wug=="],
 
     "pulse-examples/@vitejs/plugin-react": ["@vitejs/plugin-react@4.7.0", "", { "dependencies": { "@babel/core": "^7.28.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.27", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA=="],
 

@@ -12,7 +12,11 @@
   },
   "dependencies": {
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "@pulse-js/svelte": "latest",
+    "@pulse-js/react": "latest",
+    "@pulse-js/vue": "latest",
+    "@pulse-js/core": "latest"
   },
   "devDependencies": {
     "@types/react": "^19.2.8",
