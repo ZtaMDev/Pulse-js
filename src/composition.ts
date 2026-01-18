@@ -42,7 +42,7 @@ export function guardAll(nameOrGuards: string | Guard<any>[], maybeGuards?: Guar
       throw new Error(message);
     }
     return true;
-  });
+  }, 4);
 }
 
 /**
@@ -70,7 +70,7 @@ export function guardAny(nameOrGuards: string | Guard<any>[], maybeGuards?: Guar
       allFails.push(message);
     }
     throw new Error(allFails.length > 0 ? allFails.join(' and ') : 'no conditions met');
-  });
+  }, 4);
 }
 
 /**
@@ -93,7 +93,7 @@ export function guardNot(nameOrTarget: string | Guard<any> | (() => any), maybeT
       return !target.ok();
     }
     return !target();
-  });
+  }, 4);
 }
 
 /**

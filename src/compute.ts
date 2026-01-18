@@ -27,5 +27,5 @@ export function compute<R>(
   return guard(name, () => {
     const values = dependencies.map(dep => (typeof dep === 'function' ? dep() : dep));
     return processor(...values);
-  });
+  }, 4);
 }

@@ -225,15 +225,13 @@ class PulseInspector extends HTMLElement {
       return;
     }
 
-    // Edit Source
     const valueEl = target.closest('.editable-value');
     if (valueEl) {
+      const id = valueEl.getAttribute('data-id');
       const name = valueEl.getAttribute('data-name');
-      const unit = this.units.find(u => (u as any)._name === name);
-      // Only sources AND must have a name to be editable (names are used for tracking)
-      const hasName = (unit as any)._name && (unit as any)._name !== 'unnamed';
+      const unit = this.units.find(u => (u as any)._id === id || (u as any)._name === name);
       
-      if (unit && !('state' in unit) && hasName) {
+      if (unit && !('state' in unit)) {
         this.editingUnit = unit;
         this.editValue = JSON.stringify((unit as any)());
         this.render();
@@ -374,6 +372,7 @@ class PulseInspector extends HTMLElement {
   private renderUnitCard(unit: PulseUnit) {
     const isGuard = 'state' in unit;
     const name = (unit as any)._name || 'unnamed';
+    const id = (unit as any)._id;
     const explanation = isGuard ? (unit as any).explain() : null;
     const value = isGuard ? explanation.value : (unit as any)();
     
@@ -399,13 +398,13 @@ class PulseInspector extends HTMLElement {
               <input class="edit-input" value='${this.safeStringify(value)}' />
             </form>
           ` : `
-            <div class="value-row ${(!isGuard && name !== 'unnamed') ? 'editable-value' : ''}" 
+            <div class="value-row ${!isGuard ? 'editable-value' : ''}" 
+                 data-id="${id}" 
                  data-name="${name}" 
-                 title="${!isGuard ? (name === 'unnamed' ? 'Unnamed sources cannot be edited (not trackable)' : 'Click to edit') : ''}">
+                 title="${!isGuard ? 'Click to edit' : ''}">
               <span style="opacity:0.5;margin-right:6px">Value:</span> 
               <span class="value-text">${this.formatValue(value)}</span>
-              ${(!isGuard && name !== 'unnamed') ? `<span class="edit-icon">${ICONS.edit}</span>` : ''}
-              ${(!isGuard && name === 'unnamed') ? `<span style="opacity:0.3;font-size:10px;margin-left:auto">🔒 Locked</span>` : ''}
+              ${!isGuard ? `<span class="edit-icon">${ICONS.edit}</span>` : ''}
             </div>
           `}
 

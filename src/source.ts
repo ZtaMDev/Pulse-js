@@ -118,7 +118,7 @@ export interface Source<T> {
  * user.set({ name: 'Bob' });
  * ```
  */
-export function source<T>(initialValue: T, options: SourceOptions<T> = {}): Source<T> {
+export function source<T>(initialValue: T, options: SourceOptions<T> = {}, _internalOffset = 3): Source<T> {
   let value = initialValue;
   const subscribers = new Set<Subscriber<T>>();
   const dependents = new Set<Trackable>();

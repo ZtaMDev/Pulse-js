@@ -154,15 +154,15 @@ Compare Pulse primitives:
 
 Pulse provides official adapters for major frameworks to ensure seamless integration.
 
-| Framework  | Package            | Documentation                                                           |
-| :--------- | :----------------- | :---------------------------------------------------------------------- |
-| **React**  | `@pulse-js/react`  | [Read Docs](https://github.com/ZtaMDev/Pulse/tree/main/packages/react)  |
-| **Vue**    | `@pulse-js/vue`    | [Read Docs](https://github.com/ZtaMDev/Pulse/tree/main/packages/vue)    |
-| **Svelte** | `@pulse-js/svelte` | [Read Docs](https://github.com/ZtaMDev/Pulse/tree/main/packages/svelte) |
+| Framework  | Package            | Documentation                                                |
+| :--------- | :----------------- | :----------------------------------------------------------- |
+| **React**  | `@pulse-js/react`  | [Read Docs](https://pulse-js.vercel.app/integrations/react)  |
+| **Vue**    | `@pulse-js/vue`    | [Read Docs](https://pulse-js.vercel.app/integrations/vue)    |
+| **Svelte** | `@pulse-js/svelte` | [Read Docs](https://pulse-js.vercel.app/integrations/svelte) |
 
 ## Developer Tools
 
-Debug your reactive graph with **[Pulse Tools](https://github.com/ZtaMDev/Pulse/tree/main/packages/tools)**, a powerful framework-agnostic inspector.
+Debug your reactive graph with **[Pulse Tools](https://pulse-js.vercel.app/guides/devtools/)**, a powerful framework-agnostic inspector.
 
 ### Features
 

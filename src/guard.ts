@@ -177,7 +177,7 @@ export function guardOk<T>(value: T): T {
   return value;
 }
 
-export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), fn?: () => T | Promise<T>): Guard<T> {
+export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), fn?: () => T | Promise<T>, _internalOffset = 3): Guard<T> {
   const name = typeof nameOrFn === 'string' ? nameOrFn : undefined;
   const evaluator = typeof nameOrFn === 'function' ? nameOrFn : fn;
 
@@ -396,7 +396,6 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
   
   g._evaluate = () => evaluate();
 
-  // SSR internal hooks
   (g as any)._name = name;
   (g as any)._hydrate = (newState: GuardState<T>) => {
     state = newState;
