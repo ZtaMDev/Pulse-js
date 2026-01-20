@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "pulse",
@@ -27,10 +28,10 @@
     },
     "packages/react": {
       "name": "@pulse-js/react",
-      "version": "0.1.6",
+      "version": "0.1.9",
       "dependencies": {
-        "@pulse-js/core": "^0.1.8",
-        "@pulse-js/tools": "^0.1.5",
+        "@pulse-js/core": "^0.2.1",
+        "@pulse-js/tools": "^0.1.8",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -43,9 +44,9 @@
     },
     "packages/svelte": {
       "name": "@pulse-js/svelte",
-      "version": "0.1.1",
+      "version": "0.1.5",
       "dependencies": {
-        "@pulse-js/core": "^0.1.8",
+        "@pulse-js/core": "^0.2.1",
       },
       "devDependencies": {
         "svelte": "^5.0.0",
@@ -58,16 +59,16 @@
     },
     "packages/tools": {
       "name": "@pulse-js/tools",
-      "version": "0.1.6",
+      "version": "0.1.9",
       "dependencies": {
-        "@pulse-js/core": "^0.1.8",
+        "@pulse-js/core": "^0.2.1",
       },
     },
     "packages/vue": {
       "name": "@pulse-js/vue",
-      "version": "0.1.0",
+      "version": "0.1.3",
       "dependencies": {
-        "@pulse-js/core": "^0.1.8",
+        "@pulse-js/core": "^0.2.1",
       },
       "devDependencies": {
         "tsup": "^8.0.0",
@@ -83,9 +84,6 @@
       "version": "0.0.0",
       "dependencies": {
         "@pulse-js/core": "latest",
-        "@pulse-js/react": "latest",
-        "@pulse-js/svelte": "latest",
-        "@pulse-js/vue": "latest",
         "react": "^19.2.3",
         "react-dom": "^19.2.3",
       },
@@ -120,7 +118,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@pulse-js/core": "latest",
-        "@pulse-js/svelte": "link:@pulse-js/svelte",
+        "@pulse-js/svelte": "latest",
         "@pulse-js/tools": "latest",
         "svelte": "5.0.0",
       },
@@ -282,7 +280,7 @@
 
     "@pkgjs/parseargs": ["@pkgjs/parseargs@0.11.0", "", {}, "sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg=="],
 
-    "@pulse-js/core": ["@pulse-js/core@0.1.8", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-TA9748Li0Duz7ac0DxskP/CEuMZxOtWB5Dg6G1I1zZDHPefbbEuCYEDQYGChUKFqM16ukHHzYNaMgAxM1GB64Q=="],
+    "@pulse-js/core": ["@pulse-js/core@0.2.1", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-Gog/mwEObSxFIJ6BWijPOQkM71JOYC1hU0Y5tDotGZAZbTvYzvG3o40LcEu/WAYYerzsWE5dC5zkaJ5f3RmSXw=="],
 
     "@pulse-js/react": ["@pulse-js/react@workspace:packages/react"],
 
@@ -960,25 +958,19 @@
 
     "path-scurry/lru-cache": ["lru-cache@10.4.3", "", {}, "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ=="],
 
-    "pulse-examples/@pulse-js/react": ["@pulse-js/react@0.1.6", "", { "dependencies": { "@pulse-js/core": "^0.1.8", "@pulse-js/tools": "^0.1.6" }, "peerDependencies": { "react": "^19.2.3" } }, "sha512-1paVAvbpaFPc7XcfiV2TbSf3nbjL5fN62kxtsjAqnk6P7Uqpt96m4u5YGwuAMsJJdqYk+BUPnvu2qzscd3D0wQ=="],
-
-    "pulse-examples/@pulse-js/svelte": ["@pulse-js/svelte@0.1.1", "", { "dependencies": { "@pulse-js/core": "^0.1.8" }, "peerDependencies": { "svelte": "^4.0.0 || ^5.0.0" } }, "sha512-21qVjPPE0jPzJ+2NpSnaTB3HFB7uaMidCZABClcnz30itlmg6JyAbxWDWkJ6ZQvy1yPhfM8b9gwiT64WkWH9oA=="],
-
-    "pulse-examples/@pulse-js/vue": ["@pulse-js/vue@0.1.0", "", { "dependencies": { "@pulse-js/core": "^0.1.8" }, "peerDependencies": { "vue": "^3.5.0" } }, "sha512-IwCYy73Zx6sb/adjthuM5Qekh3T5ljfZ2z3WF1vlYFPLseQ++VTyZ0i6ocLBBBuRYX6rMOKEVgNzIhUmnv0Wug=="],
-
     "pulse-examples/@vitejs/plugin-react": ["@vitejs/plugin-react@4.7.0", "", { "dependencies": { "@babel/core": "^7.28.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.27", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA=="],
 
-    "pulse-svelte-test/@pulse-js/svelte": ["@pulse-js/svelte@link:@pulse-js/svelte", {}],
+    "pulse-svelte-test/@pulse-js/svelte": ["@pulse-js/svelte@0.1.5", "", { "dependencies": { "@pulse-js/core": "^0.2.1" }, "peerDependencies": { "svelte": "^4.0.0 || ^5.0.0" } }, "sha512-xlB+dQRIbDpf1G0CNxclY0wmoDT/l2+4ks86b0163mA39z2lvD0uc+xBLmMFlD1gRHMNPhkNwlUVKEGdXlxjkQ=="],
 
-    "pulse-svelte-test/@pulse-js/tools": ["@pulse-js/tools@0.1.5", "", { "dependencies": { "@pulse-js/core": "^0.1.8" } }, "sha512-2GS8Vu04CDcbRNxnJZkAoB9iGXvk/gX8SFtBGKNJ4c67vwS+DvuXC68FH1We/wvSmQWBLMU22SFuAlWTdpzUDA=="],
+    "pulse-svelte-test/@pulse-js/tools": ["@pulse-js/tools@0.1.9", "", { "dependencies": { "@pulse-js/core": "^0.2.1" } }, "sha512-RpQM9itZOSCnTGOsoxJw8XpR4Grzx3eVjtrSoaE7lQB/xDmRk/hQ9DtT3zzk2DlbsA48zs6YOWcWIOPULSHW0g=="],
 
     "pulse-svelte-test/@sveltejs/vite-plugin-svelte": ["@sveltejs/vite-plugin-svelte@4.0.4", "", { "dependencies": { "@sveltejs/vite-plugin-svelte-inspector": "^3.0.0-next.0||^3.0.0", "debug": "^4.3.7", "deepmerge": "^4.3.1", "kleur": "^4.1.5", "magic-string": "^0.30.12", "vitefu": "^1.0.3" }, "peerDependencies": { "svelte": "^5.0.0-next.96 || ^5.0.0", "vite": "^5.0.0" } }, "sha512-0ba1RQ/PHen5FGpdSrW7Y3fAMQjrXantECALeOiOdBdzR5+5vPP6HVZRLmZaQL+W8m++o+haIAKq5qT+MiZ7VA=="],
 
     "pulse-svelte-test/svelte": ["svelte@5.0.0", "", { "dependencies": { "@ampproject/remapping": "^2.3.0", "@jridgewell/sourcemap-codec": "^1.5.0", "@types/estree": "^1.0.5", "acorn": "^8.12.1", "acorn-typescript": "^1.4.13", "aria-query": "^5.3.1", "axobject-query": "^4.1.0", "esm-env": "^1.0.0", "esrap": "^1.2.2", "is-reference": "^3.0.2", "locate-character": "^3.0.0", "magic-string": "^0.30.11", "zimmerframe": "^1.1.2" } }, "sha512-jv2IvTtakG58DqZMo6fY3T6HFmGV4iDQH2lSUyfmCEYaoa+aCNcF+9rERbdDvT4XDF0nQBg6TEoJn0dirED8VQ=="],
 
-    "pulse-test-react/@pulse-js/react": ["@pulse-js/react@0.1.5", "", { "dependencies": { "@pulse-js/core": "^0.1.8", "@pulse-js/tools": "^0.1.5" }, "peerDependencies": { "react": "^19.2.3" } }, "sha512-TI4NkAhNsWF4LYbGK3EumLD4aQ+ZAHGz6Ui2JJaoDAkyGYbXcfevfp7mZAcpAGf/iYmy/iiFab3lO000AonuMg=="],
+    "pulse-test-react/@pulse-js/react": ["@pulse-js/react@0.1.9", "", { "dependencies": { "@pulse-js/core": "^0.2.1", "@pulse-js/tools": "^0.1.8" }, "peerDependencies": { "react": "^19.2.3" } }, "sha512-I2se4YENv+rTBDLQfBhaMnHwD8Md40Sye6dVk27oiPs28cXBWesOzgVU4cc/V46ou39XZyqNMCkfB8nIVhip4A=="],
 
-    "pulse-test-react/@pulse-js/tools": ["@pulse-js/tools@0.1.5", "", { "dependencies": { "@pulse-js/core": "^0.1.8" } }, "sha512-2GS8Vu04CDcbRNxnJZkAoB9iGXvk/gX8SFtBGKNJ4c67vwS+DvuXC68FH1We/wvSmQWBLMU22SFuAlWTdpzUDA=="],
+    "pulse-test-react/@pulse-js/tools": ["@pulse-js/tools@0.1.9", "", { "dependencies": { "@pulse-js/core": "^0.2.1" } }, "sha512-RpQM9itZOSCnTGOsoxJw8XpR4Grzx3eVjtrSoaE7lQB/xDmRk/hQ9DtT3zzk2DlbsA48zs6YOWcWIOPULSHW0g=="],
 
     "pulse-test-react/@types/react": ["@types/react@18.3.27", "", { "dependencies": { "@types/prop-types": "*", "csstype": "^3.2.2" } }, "sha512-cisd7gxkzjBKU2GgdYrTdtQx1SORymWyaAFhaxQPK9bYO9ot3Y5OikQRvY0VYQtvwjeQnizCINJAenh/V7MK2w=="],
 
@@ -989,6 +981,8 @@
     "pulse-test-react/react": ["react@18.3.1", "", { "dependencies": { "loose-envify": "^1.1.0" } }, "sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ=="],
 
     "pulse-test-react/react-dom": ["react-dom@18.3.1", "", { "dependencies": { "loose-envify": "^1.1.0", "scheduler": "^0.23.2" }, "peerDependencies": { "react": "^18.3.1" } }, "sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw=="],
+
+    "pulse-vue-test/@pulse-js/core": ["@pulse-js/core@0.1.8", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-TA9748Li0Duz7ac0DxskP/CEuMZxOtWB5Dg6G1I1zZDHPefbbEuCYEDQYGChUKFqM16ukHHzYNaMgAxM1GB64Q=="],
 
     "pulse-vue-test/@pulse-js/tools": ["@pulse-js/tools@0.1.5", "", { "dependencies": { "@pulse-js/core": "^0.1.8" } }, "sha512-2GS8Vu04CDcbRNxnJZkAoB9iGXvk/gX8SFtBGKNJ4c67vwS+DvuXC68FH1We/wvSmQWBLMU22SFuAlWTdpzUDA=="],
 

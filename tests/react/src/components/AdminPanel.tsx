@@ -1,10 +1,9 @@
-import { guard, source } from '@pulse-js/core';
-import { usePulse } from '@pulse-js/react';
+import { guard, guardFail } from '@pulse-js/core';
+import { formatReason, usePulse } from '@pulse-js/react';
 import { useState } from 'react';
 
 // Mock API state
 let mockUser: any = null;
-let exmp = source(0);
 // Mock fetch to simulate the user's logic
 const mockFetch = async (url: string) => {
   await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network lag
@@ -22,9 +21,8 @@ const isAdmin = guard('admin-check', async () => {
   const response = await mockFetch('/api/user');
   const user = await response.json();
   
-  if (!user) throw 'Authentication required';
-  if (user.role !== 'admin') return false; // Fails with default reason
-  
+  if (!user) return guardFail({code: 'AUTH', message: 'Authentication required'});
+  if (user.role !== 'admin') return guardFail({code: 'AUTH', message: 'You are not an admin'});
   return true; // Success!
 });
 
@@ -33,9 +31,38 @@ function Spinner() {
 }
 
 function ErrorMessage({ msg }: { msg: any }) {
+  const isObject = typeof msg === 'object' && msg !== null;
+  const code = isObject ? msg.code : null;
+  const message = isObject ? msg.message : msg;
+
   return (
-    <div style={{ color: 'red', border: '1px solid red', padding: '10px', marginTop: '10px' }}>
-      <strong>Blocked:</strong> {typeof msg === 'string' ? msg : JSON.stringify(msg)}
+    <div style={{ 
+      color: '#d32f2f', 
+      background: '#ffebee', 
+      border: '1px solid #ef9a9a', 
+      padding: '12px', 
+      marginTop: '10px',
+      borderRadius: '8px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <strong>Blocked</strong>
+        {code && (
+          <span style={{ 
+            fontSize: '0.75rem', 
+            background: '#d32f2f', 
+            color: 'white', 
+            padding: '2px 6px', 
+            borderRadius: '4px',
+            textTransform: 'uppercase'
+          }}>
+            {code}
+          </span>
+        )}
+      </div>
+      <div style={{ fontSize: '0.95rem' }}>{message}</div>
     </div>
   );
 }

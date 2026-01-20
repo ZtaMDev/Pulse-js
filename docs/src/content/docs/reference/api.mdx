@@ -15,8 +15,8 @@ The current snapshot of a Guard.
 interface GuardState<T> {
   status: 'pending' | 'ok' | 'fail';
   value?: T;
-  reason?: string | GuardReason;
-  lastReason?: string | GuardReason;
+  reason?: GuardReason;
+  lastReason?: GuardReason;
 }
 ```
 
@@ -40,13 +40,13 @@ interface GuardExplanation {
   name: string;
   status: GuardStatus;
   value?: any;
-  reason?: string | GuardReason;
-  lastReason?: string | GuardReason;
+  reason?: GuardReason;
+  lastReason?: GuardReason;
   dependencies: Array<{
     name: string;
     type: 'source' | 'guard';
     status?: GuardStatus;
-    reason?: string | GuardReason;  // Reason if dependency failed
+    reason?: GuardReason;  // Reason if dependency failed
   }>;
 }
 ```

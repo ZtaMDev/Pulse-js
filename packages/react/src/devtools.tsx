@@ -12,9 +12,13 @@ import '@pulse-js/tools';
  * ```
  */
 
-const isDev = typeof process !== 'undefined' 
-  ? process.env.NODE_ENV === 'development' 
-  : (import.meta as any).env?.DEV || true; // Fallback for Vite/etc.
+const isDev = (() => {
+  try {
+    return process.env.NODE_ENV === 'development';
+  } catch (e) {
+    return true; 
+  }
+})();
 
 if (isDev && typeof document !== 'undefined') {
   // Prevent duplicate injection

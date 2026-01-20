@@ -32,9 +32,9 @@ export interface GuardState<T> {
   /** The value returned by the evaluator (only if status is 'ok'). */
   value?: T;
   /** The reason why the guard failed. */
-  reason?: string | GuardReason;
+  reason?: GuardReason;
   /** The last known failure reason, persisted even during 'pending'. */
-  lastReason?: string | GuardReason;
+  lastReason?: GuardReason;
   /** The timestamp when the status last changed. */
   updatedAt?: number;
 }
@@ -45,14 +45,14 @@ export interface GuardState<T> {
 export interface GuardExplanation {
   name: string;
   status: GuardStatus;
-  reason?: string | GuardReason;
-  lastReason?: string | GuardReason;
+  reason?: GuardReason;
+  lastReason?: GuardReason;
   value?: any;
   dependencies: Array<{
     name: string;
     type: 'source' | 'guard';
     status?: GuardStatus;
-    reason?: string | GuardReason;
+    reason?: GuardReason;
   }>;
 }
 
@@ -96,9 +96,9 @@ export interface Guard<T = boolean> {
    * Returns the failure reason message if the guard is in the 'fail' state.
    * Useful for displaying semantic error messages in the UI.
    * 
-   * @returns The error message or undefined.
+   * @returns The error message object or undefined.
    */
-  reason(): string | GuardReason | undefined;
+  reason(): GuardReason | undefined;
 
   /**
    * Returns a snapshot of the full internal state of the guard.
@@ -235,7 +235,12 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
               if (currentId === evaluationId) {
                 persistDependencies();
                 if (resolved === false) {
-                  const reason = name ? `${name} failed` : 'condition failed';
+                  const message = name ? `${name} failed` : 'condition failed';
+                  const reason: GuardReason = {
+                    code: 'GUARD_FAIL',
+                    message,
+                    toString: () => message
+                  };
                   state = { status: 'fail', reason, lastReason: reason, updatedAt: Date.now() };
                 } else if (resolved === undefined) {
                   state = { ...state, status: 'pending', updatedAt: Date.now() };
@@ -248,19 +253,30 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
             .catch(err => {
               if (currentId === evaluationId) {
                 persistDependencies();
-                const message = err instanceof Error ? err.message : String(err);
-                const reason: string | GuardReason = err.meta 
-                  ? { 
-                      code: err.code || 'ERROR', 
-                      message,
-                      meta: err.meta,
-                      toString: () => message
-                    }
-                  : message;
+                
+                let reason: GuardReason;
+                if (err && err._pulseFail) {
+                  reason = err._reason;
+                } else {
+                  const message = err instanceof Error ? err.message : String(err);
+                  reason = err && err.meta 
+                    ? { 
+                        code: err.code || 'ERROR', 
+                        message,
+                        meta: err.meta,
+                        toString: () => message
+                      }
+                    : {
+                        code: 'ERROR',
+                        message,
+                        toString: () => message
+                      };
+                }
+
                 state = { 
                   status: 'fail', 
                   reason,
-                  lastReason: state.reason || reason,
+                  lastReason: (state as any).reason || reason,
                   updatedAt: Date.now() 
                 };
                 notifyDependents();
@@ -269,7 +285,12 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
         } else {
           persistDependencies();
           if (result === false) {
-            const reason = name ? `${name} failed` : 'condition failed';
+            const message = name ? `${name} failed` : 'condition failed';
+            const reason: GuardReason = {
+              code: 'GUARD_FAIL',
+              message,
+              toString: () => message
+            };
             state = { status: 'fail', reason, lastReason: reason, updatedAt: Date.now() };
           } else if (result === undefined) {
             state = { ...state, status: 'pending', updatedAt: Date.now() };
@@ -295,14 +316,18 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
         };
       } else {
         const message = err instanceof Error ? err.message : String(err);
-        const reason: string | GuardReason = err.meta 
+        const reason: GuardReason = err.meta 
           ? { 
               code: err.code || 'ERROR', 
               message,
               meta: err.meta,
               toString: () => message
             }
-          : message;
+          : {
+              code: 'ERROR',
+              message,
+              toString: () => message
+            };
         state = { 
           status: 'fail', 
           reason,
@@ -407,7 +432,7 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
       reason: state.reason,
       lastReason: state.lastReason,
       value: state.value,
-      dependencies: deps
+      dependencies: deps as any
     };
   };
   

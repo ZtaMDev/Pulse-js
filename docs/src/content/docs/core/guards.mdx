@@ -47,7 +47,7 @@ Returns `true` if the last evaluation failed.
 Returns `true` if the guard is currently evaluating (async).
 
 ### `.reason()`
-Returns the reason for the failure. This can be a string or a structured object.
+Returns the reason for the failure. In Pulse v0.2.2, this is **always a structured object**.
 
 ```ts
 if (isAuthorized.fail()) {
@@ -63,15 +63,19 @@ Sometimes returning `false` isn't enough. You might want to fail with a specific
 
 Import `guardFail` to stop execution immediately and mark the guard as failed.
 
+**Structured Reasons (Async Friendly):**
+You can pass a structured object to provide more context to your UI.
+
 ```ts
 import { guard, guardFail } from '@pulse-js/core';
 
-const userCheck = guard(() => {
+const userCheck = guard('user-auth', async () => {
+    const user = await fetchUser();
+    
     if (!user) {
-        // Fail with structure
         guardFail({ 
             code: 'AUTH_REQUIRED', 
-            message: ' User must be logged in',
+            message: 'User must be logged in',
             meta: { redirect: '/login' }
         });
     }
