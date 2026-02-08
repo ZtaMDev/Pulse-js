@@ -116,6 +116,17 @@ export function pulse<T extends object>(
         return () => ({ ...target });
       }
 
+      const desc = Object.getOwnPropertyDescriptor(obj, prop);
+
+      // Handle Accessors (Getters)
+      if (desc && desc.get) {
+         const value = Reflect.get(obj, prop, proxy);
+         if (deep && value && typeof value === 'object' && !isPulseObject(value)) {
+           return value; 
+         }
+         return value;
+      }
+
       const value = (obj as any)[prop];
 
       // Don't track if it's a function (method) - methods will track during Execution
