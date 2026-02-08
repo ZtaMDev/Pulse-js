@@ -1,6 +1,6 @@
 {
   "name": "@pulse-js/astro",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Astro integration for Pulse-js reactive state management",
   "type": "module",
   "main": "dist/index.js",
@@ -20,7 +20,7 @@
     "build": "bun x tsup src/index.ts src/integration.ts --format esm --dts --clean"
   },
   "peerDependencies": {
-    "@pulse-js/core": "^0.3.0",
+    "@pulse-js/core": "^0.3.1",
     "astro": "^4.0.0 || ^5.0.0"
   },
   "devDependencies": {

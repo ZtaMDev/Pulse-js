@@ -1,6 +1,6 @@
 {
   "name": "@pulse-js/svelte",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "main": "dist/index.svelte.cjs",
   "module": "dist/index.svelte.js",
@@ -27,7 +27,7 @@
     "svelte": "^4.0.0 || ^5.0.0"
   },
   "dependencies": {
-    "@pulse-js/core": "^0.3.0"
+    "@pulse-js/core": "^0.3.1"
   },
   "devDependencies": {
     "svelte": "^5.0.0",

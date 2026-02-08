@@ -1,6 +1,6 @@
 {
   "name": "@pulse-js/vue",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -16,7 +16,7 @@
     "vue": "^3.5.0"
   },
   "dependencies": {
-    "@pulse-js/core": "^0.3.0"
+    "@pulse-js/core": "^0.3.1"
   },
   "devDependencies": {
     "vue": "^3.5.0",
