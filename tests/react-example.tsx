@@ -11,6 +11,19 @@ const canPurchase = guard.all('can-purchase', [
     hasBalance
 ]);
 
+// 1.1 TanStack Query Integration Simulation
+// Mocking a query result from useQuery
+const mockUserQuery = {
+    data: { name: 'Jane' },
+    isLoading: false,
+    isSuccess: true,
+    status: 'success' as const
+};
+
+// Use the bridge to create a Pulse Guard from the query
+import { guardFromQuery } from '@pulse-js/tanstack';
+const queryGuard = guardFromQuery(() => mockUserQuery, { name: 'user-query' });
+
 // 2. UI Component
 export function PurchaseWidget() {
     const purchaseState = useGuard(canPurchase);

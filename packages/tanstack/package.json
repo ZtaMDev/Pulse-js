@@ -1,0 +1,34 @@
+{
+  "name": "@pulse-js/tanstack",
+  "version": "0.3.0",
+  "description": "TanStack Query integration for Pulse-js - Bridge between server state and reactive guards",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "bun x tsup src/index.ts --format esm --dts --clean"
+  },
+  "peerDependencies": {
+    "@pulse-js/core": "^0.3.0",
+    "@tanstack/query-core": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tanstack/query-core": "^5.0.0"
+  },
+  "keywords": [
+    "tanstack-query",
+    "react-query",
+    "pulse-js",
+    "state",
+    "reactivity"
+  ],
+  "author": "ZtaMDev",
+  "license": "MIT"
+}

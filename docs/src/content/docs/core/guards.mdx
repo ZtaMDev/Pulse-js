@@ -3,13 +3,30 @@ title: Guards
 description: Semantic conditions and business logic.
 ---
 
-Guards are the heart of Pulse. They represent **Conditioned Truths** or business rules. Unlike simple computed values, Guards track their own `status` (`ok`, `fail`, `pending`) and explicit failure `reason`.
+Guards are the most powerful unit in Pulse.js. They serve as reactive "firewalls" that can compute derived state, handle asynchronous logic, and prevent inconsistent updates to your UI.
+
+In Pulse v3, Guards have been enhanced to act as high-performance **Selectors** with built-in dependency tracking and rich failure context.
+
+## The Selector Pattern
+
+You can now use Guards as lightweight computed values. When you access other reactive units inside the guard function, Pulse automatically subscribes to them.
+
+```ts
+import { guard, pulse } from '@pulse-js/core';
+
+const user = pulse({ name: 'Alice', role: 'guest' });
+
+const isAdmin = guard('is-admin', () => {
+  return user.role === 'admin';
+});
+```
+
+Guards keep track of their own `status` (`ok`, `fail`, `pending`) and an explicit failure `reason`. Unlike simple computed values, they provide semantic context for why a calculation failed or is still loading.
 
 ## The Problem
 In traditional state management, you often handle "loading", "error", and "success" states manually with separate variables.
 
 ```ts
-// The old way
 let isLoading = false;
 let error = null;
 let data = null;
@@ -47,13 +64,18 @@ Returns `true` if the last evaluation failed.
 Returns `true` if the guard is currently evaluating (async).
 
 ### `.reason()`
-Returns the reason for the failure. In Pulse v0.2.2, this is **always a structured object**.
+Returns the reason for the failure. In Pulse v3, this is **guaranteed to be a structured object**, allowing you to access detailed error information.
 
 ```ts
-if (isAuthorized.fail()) {
-  console.error(isAuthorized.reason()); // "Not logged in"
+const reason = isAuthorized.reason();
+
+if (reason) {
+  console.log(reason.code);    // e.g. "AUTH_REQUIRED"
+  console.log(reason.message); // e.g. "You must be logged in"
 }
 ```
+
+> Pulse reasons implement `toString()`, so you can still render them directly in your UI (e.g. `{isAuthorized.reason()}`) if you just want to show the message.
 
 ## Advanced Control Flow
 
@@ -138,13 +160,13 @@ console.log(explanation);
 {
   name: 'can-place-order',
   status: 'fail',
-  reason: 'Insufficient balance',
+  reason: { code: 'BALANCE', message: 'Insufficient balance' },
   dependencies: [
     { name: 'has-items', status: 'ok' },
     { 
       name: 'sufficient-balance', 
       status: 'fail', 
-      reason: 'Balance is too low'
+      reason: { code: 'LOW_FUNDS', message: 'Balance is too low' }
     } 
   ]
 }

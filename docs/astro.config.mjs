@@ -35,6 +35,7 @@ export default defineConfig({
 				{
 					label: 'Core Concepts',
 					items: [
+						{ label: 'Pulse', slug: 'core/pulse' },
 						{ label: 'Sources', slug: 'core/sources' },
 						{ label: 'Guards', slug: 'core/guards' },
 						{ label: 'Computed Values', slug: 'core/computed' },
@@ -54,6 +55,8 @@ export default defineConfig({
                         { label: 'React', slug: 'integrations/react' },
                         { label: 'Vue', slug: 'integrations/vue' },
                         { label: 'Svelte', slug: 'integrations/svelte' },
+						{ label: 'Astro', slug: 'integrations/astro' },
+						{ label: 'TanStack', slug: 'integrations/tanstack' },
                     ],
                 },
 				{

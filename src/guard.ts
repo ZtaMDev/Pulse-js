@@ -449,13 +449,11 @@ export function guard<T = boolean>(nameOrFn?: string | (() => T | Promise<T>), f
     registerGuardForHydration(name, g);
   }
 
-  PulseRegistry.register(g);
-
   // Initial evaluation must happen after g is fully defined
   // to allow cycle detection to work even during initial run.
   evaluate();
 
-  return g;
+  return PulseRegistry.register(g);
 }
 
 /**
@@ -489,3 +487,83 @@ guard.map = function<T, U>(
     return mapper(value);
   });
 };
+
+/**
+ * Creates a Guard from a Pulse Object using a selector function.
+ * 
+ * The selector extracts and transforms data from a Pulse object,
+ * creating a reactive computed value with full Guard semantics.
+ * 
+ * @template T - Pulse object type
+ * @template U - Selected result type
+ * @param pulseObj - A Pulse object to select from
+ * @param selector - Function to extract/transform data
+ * @param name - Optional guard name
+ * 
+ * @example
+ * ```ts
+ * const auth = pulse({ user: { name: 'Alice', role: 'admin' } });
+ * const userName = guard.select(auth, a => a.user?.name, 'user-name');
+ * console.log(userName()); // 'Alice'
+ * ```
+ */
+guard.select = function<T extends object, U>(
+  pulseObj: T,
+  selector: (obj: T) => U | Promise<U>,
+  name?: string
+): Guard<U> {
+  const guardName = name || `select-${(pulseObj as any)._name || 'pulse'}`;
+  
+  return guard(guardName, () => {
+    return selector(pulseObj);
+  });
+};
+
+/**
+ * Creates a Guard from any reactive value or function.
+ * 
+ * Useful for wrapping external reactive sources (like TanStack Query results)
+ * to create Guards that can be composed with other Pulse primitives.
+ * 
+ * @template T - Value type
+ * @param getValue - Function that returns the current value
+ * @param options - Configuration (name, pending/fail detection)
+ * 
+ * @example
+ * ```ts
+ * // Wrapping a TanStack Query result
+ * const userQuery = useQuery(['user'], fetchUser);
+ * const userGuard = guard.from(() => ({
+ *   value: userQuery.data,
+ *   isLoading: userQuery.isLoading,
+ *   error: userQuery.error
+ * }), { name: 'user-query' });
+ * ```
+ */
+guard.from = function<T>(
+  getValue: () => { value?: T; isLoading?: boolean; error?: any } | T,
+  options?: { name?: string }
+): Guard<T | undefined> {
+  const name = options?.name || 'from-external';
+  
+  return guard(name, () => {
+    const result = getValue();
+    
+    // Check if result is a wrapped value with status info
+    if (result && typeof result === 'object' && ('value' in result || 'isLoading' in result || 'error' in result)) {
+      const wrapped = result as { value?: T; isLoading?: boolean; error?: any };
+      
+      if (wrapped.isLoading) {
+        return undefined; // Pending
+      }
+      if (wrapped.error) {
+        guardFail(wrapped.error?.message || 'External error');
+      }
+      return wrapped.value;
+    }
+    
+    // Plain value
+    return result as T;
+  });
+};
+

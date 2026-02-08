@@ -23,6 +23,8 @@ export default defineConfig({
       "@pulse-js/tools": resolve(__dirname, "../packages/tools/src"),
       "@pulse-js/vue": resolve(__dirname, "../packages/vue/src"),
       "@pulse-js/svelte": resolve(__dirname, "../packages/svelte/src/index.svelte.ts"),
+      "@pulse-js/tanstack": resolve(__dirname, "../packages/tanstack/src"),
+      "@pulse-js/astro": resolve(__dirname, "../packages/astro/src"),
     },
   },
   test: {

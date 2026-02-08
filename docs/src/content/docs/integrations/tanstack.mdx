@@ -1,0 +1,64 @@
+---
+title: TanStack Query
+description: Bridging remote state into Pulse reactivity.
+---
+
+The `@pulse-js/tanstack` bridge allows you to seamlessly integrate asynchronous remote state from TanStack Query into the Pulse reactive ecosystem.
+
+## Installation
+
+```bash
+npm install @pulse-js/tanstack
+```
+
+## Basic Usage
+
+The bridge provides a `guardFromQuery` selector that wraps a Query instance and returns a Pulse Guard.
+
+```ts
+import { pulse } from '@pulse-js/core';
+import { guardFromQuery } from '@pulse-js/tanstack';
+import { useQuery } from '@tanstack/react-query';
+
+// 1. Define your query
+const userQuery = {
+  queryKey: ['user', 1],
+  queryFn: () => fetch('/api/user/1').then(res => res.json())
+};
+
+// 2. Wrap it in a Pulse Guard
+const userGuard = guardFromQuery('user-data', userQuery);
+
+// 3. Use it in reactive guards
+const dashboardData = guard(() => {
+  const user = userGuard.value(); // Automatically tracks
+  if (!user) return guardFail('No user data');
+  
+  return { ...user, stats: getStats() };
+});
+```
+
+## Features
+
+### Reactive Sync
+When TanStack Query refetches or updates the cache, the corresponding Pulse Guard will automatically re-evaluate and notify its dependents.
+
+### Status Mapping
+The bridge automatically maps TanStack Query statuses to Pulse Guard statuses:
+- `isLoading` / `isFetching` -> `pending`
+- `isError` -> `fail` (with the query error as the reason)
+- `isSuccess` -> `ok`
+
+### Integration with Frameworks
+Since the bridge returns a standard Pulse Guard, you can use it with any Pulse adapter (`usePulse`, `useGuard`, etc.) in React, Vue, or Svelte.
+
+```tsx
+function Profile() {
+  const { value, status, reason } = usePulse(userGuard);
+  
+  if (status === 'pending') return <div>Loading user...</div>;
+    if (status === 'fail') return <div>Error: {reason.message}</div>;
+
+  return <div>Welcome, {value.name}</div>;
+}
+```

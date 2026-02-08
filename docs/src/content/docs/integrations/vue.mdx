@@ -97,6 +97,6 @@ const state = useGuard(isAdult);
 
 <template>
   <p v-if="state.status === 'ok'">Access Granted</p>
-  <p v-else-if="state.status === 'fail'">Denied: {{ state.reason }}</p>
+          <p v-else-if="state.status === 'fail'">Denied: {{ state.reason.message }}</p>
 </template>
 ```

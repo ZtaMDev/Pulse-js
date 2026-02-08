@@ -1,0 +1,43 @@
+{
+  "name": "@pulse-js/astro",
+  "version": "0.3.0",
+  "description": "Astro integration for Pulse-js reactive state management",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./integration": {
+      "types": "./dist/integration.d.ts",
+      "import": "./dist/integration.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "bun x tsup src/index.ts src/integration.ts --format esm --dts --clean"
+  },
+  "peerDependencies": {
+    "@pulse-js/core": "^0.3.0",
+    "astro": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "astro": "^5.0.0"
+  },
+  "keywords": [
+    "astro",
+    "pulse",
+    "state",
+    "reactivity",
+    "ssr"
+  ],
+  "author": "ZtaMDev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZtaMDev/pulse.git",
+    "directory": "packages/astro"
+  }
+}

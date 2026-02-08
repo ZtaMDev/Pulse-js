@@ -28,7 +28,7 @@ function Counter() {
 ```
 
 ### With Guards
-Returns a `GuardState` object.
+Returns a `GuardState` object. In Pulse v3, the `reason` is **always a structured object**.
 
 ```tsx
 const isAdmin = guard(async () => { ... });
@@ -37,23 +37,29 @@ function AdminArea() {
   const { status, value, reason } = usePulse(isAdmin);
 
   if (status === 'pending') return <Spinner />;
-  if (status === 'fail') return <Error msg={formatReason(reason)} />;
+  if (status === 'fail') {
+    return (
+      <div className="error">
+        <strong>{reason.code}</strong>
+        <p>{reason.message}</p>
+      </div>
+    );
+  }
   
   return <Dashboard data={value} />;
 }
 ```
 
-## `formatReason` Utility
+## `GuardReason` Interface
 
-The `reason` in a `GuardState` can be a string or a structured `GuardReason` object. To render it safely in your JSX components with full type safety, use the `formatReason` helper.
+The `reason` object contains the following properties:
 
-```tsx
-import { formatReason } from '@pulse-js/react';
+- **`code`**: A short string identifier (e.g., `'AUTH_REQUIRED'`).
+- **`message`**: A human-readable description of the error.
+- **`meta`**: Optional additional context.
 
-function ErrorView({ reason }) {
-  return <p>Error: {formatReason(reason)}</p>;
-}
-```
+
+> Pulse reasons implement `toString()`. You can render them directly in JSX: `<p>{reason.toString()}</p>`.
 
 ## `useGuard` Hook
 

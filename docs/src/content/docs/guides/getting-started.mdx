@@ -140,4 +140,35 @@ Pulse provides first-class support for major frameworks.
 
     ```
   </TabItem>
+  <TabItem label="Astro">
+    ```bash 
+    npx astro add @pulse-js/astro
+    ```
+    Use Pulse state in `.astro` frontmatter for SSR.
+    ```astro
+    ---
+    import { user } from '../store';
+    // Evaluation happens on the server
+    const name = user.name;
+    ---
+    <div class={user.role}>
+      <h1>Hello {name}</h1>
+    </div>
+    ```
+  </TabItem>
+  <TabItem label="TanStack">
+    ```bash 
+    npm install @pulse-js/tanstack
+    ```
+    Bridge remote state into Pulse guards.
+    ```ts
+    import { guardFromQuery } from '@pulse-js/tanstack';
+    
+    // Returns a standard Pulse Guard
+    const userGuard = guardFromQuery('user', {
+      queryKey: ['user'],
+      queryFn: fetchUser
+    });
+    ```
+  </TabItem>
 </Tabs>

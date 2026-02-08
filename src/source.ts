@@ -156,7 +156,5 @@ export function source<T>(initialValue: T, options: SourceOptions<T> = {}): Sour
 
   (s as any)._name = options.name;
 
-  PulseRegistry.register(s);
-
-  return s;
+  return PulseRegistry.register(s);
 }

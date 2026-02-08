@@ -29,33 +29,22 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 ## Core Primitives
 
 <CardGrid>
-	<Card title="Sources" icon="puzzle">
-        **Refined Data Containers**
-        Sources hold your application's primitive state. They notify dependents when values change.
+	<Card title="Pulse Objects" icon="puzzle">
+        **Universal Proxy Reactivity**
+        `pulse()` creates deep reactive proxies that track property access and mutation automatically.
         
         ```ts
-        const user = source({ name: "Alice", id: 1 });
-        user.set({ name: "Bob", id: 1 });
+        const state = pulse({ count: 0 });
+        state.count++; // It's reactive!
         ```
 	</Card>
 	<Card title="Semantic Guards" icon="approve-check-circle">
         **First-Class Conditions**
-		Guards represent business rules. They track their own `status` (ok, fail, pending) and `reason`.
+		Guards serve as high-performance **Selectors** with built-in dependency tracking and failing context.
         
         ```ts
         const isAdmin = guard("is-admin", () => {
-           if (user().role !== "admin") return false;
-           return true; 
-        });
-        ```
-	</Card>
-    <Card title="Computed Values" icon="random">
-        **Pure Transformations**
-        Derive new data from sources or other guards with memoization.
-        
-        ```ts
-        const fullName = compute("full-name", [user], (u) => {
-            return `${u.first} ${u.last}`;
+           return user.role === "admin"; 
         });
         ```
 	</Card>
@@ -65,63 +54,56 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
         ```ts
         const canLaunch = guard.all([
-            isSystemReady,
+            isReady,
             isUserAuthorized,
-            guard.not(isMaintenanceMode)
+            guard.not(isMaintenance)
         ]);
         ```
     </Card>
 </CardGrid>
 
-## Enterprise Features
+## Pro Features
 
 <CardGrid>
 	<Card title="Async & Race Control" icon="star">
 		**Native Async Support**
-        Guards handle promises natively. Pulse implements internal versioning to automatically cancel stale evaluations, preventing race conditions.
+        Guards handle promises natively. Pulse implements internal versioning to automatically cancel stale evaluations.
 
         ```ts
-        const isServerOnline = guard("check-server", async () => {
-             const res = await fetch("/health");
-             if (!res.ok) throw "Server unreachable";
-             return true;
+        const data = guard("fetch", async () => {
+             return (await fetch("/api")).json();
         });
         ```
 	</Card>
     <Card title="Explainable Logic" icon="magnifier">
-		**Structured Debugging**
-        Call `.explain()` to get a structured tree of the current status, failure reasons, and dependencies.
+		**Deep Guard Inspection**
+        Get a structured tree of the current status, recursive dependency failures, and failure reason codes.
 
         ```ts
         const explanation = canCheckout.explain();
-        // { status: 'fail', reason: 'auth failed', ... }
+        // { status: 'fail', reason: { code: 'AUTH' }, ... }
         ```
 	</Card>
-    <Card title="Server-Side Rendering" icon="laptop">
-		**Isomorphic Design**
-        Use `evaluate()` on the server to serialize state and `hydrate()` on the client to resume seamlessly.
+    <Card title="Isomorphic SSR" icon="laptop">
+		**Astro & React Ready**
+        Evaluate guards on the server during SSR and have them seamlessly hydrate on the client.
 	</Card>
 </CardGrid>
 
 ## Ecosystem
 
 <CardGrid>
-  <Card title="React Integration" icon="star">
-    **Concurrent Mode Compatible**
-    `@pulse-js/react` uses `useSyncExternalStore` for safe concurrent updates.
-    
-    ```ts
-    const { status, reason } = usePulse(isAdmin);
-    ```
+  <Card title="Astro Native" icon="rocket">
+    **SSR & Hydration**
+    Native Astro integration with zero-config setup via `npx astro add`.
   </Card>
-  <Card title="Vue & Svelte" icon="rocket">
-    **Multi-Framework Support**
-    First-class adapters available for other major frameworks.
-    
-    ```ts
-    import { usePulse } from '@pulse-js/vue';
-    import { usePulse } from '@pulse-js/svelte';
-    ```
+  <Card title="React & Vue" icon="star">
+    **Stability First**
+    Safe concurrent updates via `usePulse` hooks for all major UI frameworks.
+  </Card>
+  <Card title="TanStack Query" icon="random">
+    **Remote State Bridge**
+    Bridge asynchronous remote state from TanStack Query into the Pulse reactive core.
   </Card>
 </CardGrid>
 

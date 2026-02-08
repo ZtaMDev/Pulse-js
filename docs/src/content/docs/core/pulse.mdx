@@ -1,0 +1,77 @@
+---
+title: Pulse Objects
+description: deep reactive proxies with pulse().
+---
+
+The `pulse()` function is the modern way to create reactive state in Pulse.js. It returns a deep reactive Proxy that allows you to work with plain JavaScript objects and arrays while maintaining fine-grained reactivity.
+
+## Creating a Pulse Object
+
+Unlike `source()`, which wraps primitives, `pulse()` is designed for objects and complex state.
+
+```typescript
+import { pulse } from '@pulse-js/core';
+
+const state = pulse({
+  count: 0,
+  user: {
+    name: 'Alice',
+    settings: {
+      theme: 'dark'
+    }
+  }
+});
+```
+
+## Direct Mutation
+
+You can mutate any property at any depth directly. Pulse will automatically track which properties are accessed and notify relevant dependents.
+
+```typescript
+state.count += 1;
+state.user.name = 'Bob';
+state.user.settings.theme = 'light';
+```
+
+## Adding Methods
+
+Pulse objects can also contain methods. When a method is called, Pulse binds it to the latest reactive proxy, allowing the method to mutate state reactively.
+
+```typescript
+const counter = pulse({
+  value: 0,
+  increment() {
+    this.value++; // 'this' refers to the reactive proxy
+  }
+});
+
+counter.increment();
+```
+
+## Deep Reactivity
+
+Pulse v3 implements "lazy deep reactivity". Nested objects are only wrapped in a proxy when they are accessed. This ensures high performance even with very large state trees.
+
+```typescript
+const nested = state.user.settings; // This is now a reactive proxy
+nested.theme = 'dark'; // Triggers updates correctly
+```
+
+## API Reference
+
+### `pulse(initialValue, options?)`
+
+- `initialValue`: The object or array to make reactive.
+- `options.name`: (Optional) A unique name for the unit, enabling HMR stability and DevTools tracking.
+- `options.deep`: (Default: `true`) Whether to enable deep reactivity.
+
+### Special Properties
+
+- `$raw`: Access the underlying non-proxied object.
+- `$subscribe(listener)`: Subscribe to changes on any property within the object.
+- `$snapshot()`: Get a shallow copy of the current state.
+
+```typescript
+console.log(state.$raw); // { count: 1, ... }
+state.$subscribe(() => console.log('State changed!'));
+```

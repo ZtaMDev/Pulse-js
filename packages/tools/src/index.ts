@@ -1,1 +1,3 @@
-export * from './pulse-inspector';
+export * from './agent';
+export * from './inspector';
+export * from './timetravel';

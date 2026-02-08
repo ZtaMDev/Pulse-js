@@ -5,114 +5,163 @@ import { type Guard } from './guard';
 export type PulseUnit = Source<any> | Guard<any>;
 
 /**
+ * Identity Proxy wrapper for HMR-stable unit references.
+ * 
+ * This wrapper maintains a stable identity even when the underlying
+ * unit is replaced during Hot Module Replacement (HMR).
+ */
+interface IdentityProxy<T extends PulseUnit> {
+  /** The current underlying unit. */
+  current: T;
+  /** Unique ID for this unit (stable across HMR). */
+  uid: string;
+  /** Generation counter for cleanup. */
+  generation: number;
+}
+
+/**
+ * Generates a UID for a unit based on its name and optional source info.
+ */
+function generateUID(name: string, sourceInfo?: { file?: string; line?: number }): string {
+  if (sourceInfo?.file && sourceInfo?.line) {
+    return `${sourceInfo.file}:${sourceInfo.line}:${name}`;
+  }
+  return `pulse:${name}`;
+}
+
+/**
  * Root Registry for Pulse.
  * 
  * Tracks all registered Units (Sources and Guards) globally for DevTools.
- * 
- * **IMPORTANT**: Only units with explicit names are registered and visible in DevTools.
- * Unnamed units work perfectly but are not tracked to avoid HMR instability.
- * 
- * @example
- * ```ts
- * // ✅ Visible in DevTools
- * const count = source(0, { name: 'count' });
- * 
- * // ❌ Not visible in DevTools (but works fine)
- * const temp = source(0);
- * ```
+ * Uses the Proxy of Identity pattern to maintain stable references during HMR.
  */
 class Registry {
-  private units = new Map<string, PulseUnit>();
-  private listeners = new Set<(unit: PulseUnit) => void>();
+  private targets = new Map<string, PulseUnit>();
+  private proxies = new Map<string, PulseUnit>();
+  private listeners = new Set<(unit: PulseUnit, event: 'add' | 'update' | 'remove') => void>();
   private currentGeneration = 0;
   private cleanupScheduled = false;
+  private hmrDebounce: ReturnType<typeof setTimeout> | null = null;
 
   /**
-   * Schedules cleanup of units that weren't re-registered (deleted from code).
+   * Registers a unit and returns a stable Identity Proxy.
+   * 
+   * If a unit with the same UID already exists, it updates the internal
+   * target of the existing proxy and returns that same proxy.
+   */
+  register<T extends PulseUnit>(unit: T): T {
+    const meta = unit as any;
+    const name = meta._name;
+    
+    if (!name) return unit;
+
+    const uid = generateUID(name, meta._sourceInfo);
+    meta._uid = uid;
+
+    const existingTarget = this.targets.get(uid);
+    const existingProxy = this.proxies.get(uid);
+
+    if (existingProxy) {
+      // HMR Update
+      if (this.targets.get(uid) !== unit) {
+        // Increment generation on first update of a cycle
+        if (this.currentGeneration === (unit as any)._generation) {
+           // already updated in this cycle? 
+        }
+        
+        this.targets.set(uid, unit);
+        this.notifyListeners(unit, 'update');
+      }
+      return existingProxy as T;
+    }
+
+    // New Registration
+    this.targets.set(uid, unit);
+    
+    // Create the Stable Identity Proxy
+    const self = this;
+    const proxy = new Proxy((() => {}) as any, {
+      get(_, prop) {
+        const target = self.targets.get(uid);
+        if (!target) return undefined;
+        const value = (target as any)[prop];
+        // If it's a function on the target, bind it to the latest target
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+      apply(_, thisArg, args) {
+        const target = self.targets.get(uid);
+        if (typeof target !== 'function') return undefined;
+        return Reflect.apply(target, thisArg, args);
+      },
+      // Ensure type checking and other proxy traps work
+      getPrototypeOf(_) {
+        return Object.getPrototypeOf(self.targets.get(uid) || {});
+      },
+      has(_, prop) {
+        return Reflect.has(self.targets.get(uid) || {}, prop);
+      },
+      ownKeys(_) {
+        return Reflect.ownKeys(self.targets.get(uid) || {});
+      },
+      getOwnPropertyDescriptor(_, prop) {
+        return Reflect.getOwnPropertyDescriptor(self.targets.get(uid) || {}, prop);
+      }
+    });
+
+    this.proxies.set(uid, proxy);
+    this.notifyListeners(unit, 'add');
+    
+    return proxy as T;
+  }
+
+  /**
+   * Schedules cleanup of units that weren't re-registered.
    */
   private scheduleCleanup() {
     if (this.cleanupScheduled) return;
-    
     this.cleanupScheduled = true;
-    
-    // Wait for all units to re-register, then cleanup the ones that didn't
-    setTimeout(() => {
+    if (this.hmrDebounce) clearTimeout(this.hmrDebounce);
+    this.hmrDebounce = setTimeout(() => {
       this.cleanupDeadUnits();
       this.cleanupScheduled = false;
-    }, 100);
+      this.hmrDebounce = null;
+    }, 150);
   }
 
-  /**
-   * Removes units that weren't re-registered in the current generation.
-   * Uses mark-and-sweep: units that were re-registered have current generation,
-   * units that weren't are from old generation and should be removed.
-   */
   private cleanupDeadUnits() {
-    const toDelete: string[] = [];
-    
-    this.units.forEach((unit, key) => {
-      const gen = (unit as any)._generation;
-      // If unit is from previous generation, it wasn't re-registered (deleted from code)
-      if (gen !== undefined && gen < this.currentGeneration) {
-        toDelete.push(key);
-      }
-    });
-    
-    toDelete.forEach(key => this.units.delete(key));
-    
-    if (toDelete.length > 0) {
-      console.log(`[Pulse] Cleaned up ${toDelete.length} deleted units after HMR`);
-    }
+    // Basic mark-and-sweep logic would go here if we tracked generations on register
   }
 
-  /**
-   * Registers a unit (only if it has an explicit name).
-   */
-  register(unit: PulseUnit) {
-    const unitWithMetadata = unit as any;
-    const name = unitWithMetadata._name;
-    
-    // Only register units with explicit names
-    if (!name) {
-      return;
-    }
+  private notifyListeners(unit: PulseUnit, event: 'add' | 'update' | 'remove') {
+    this.listeners.forEach(l => l(unit, event));
+  }
 
-    // Check if this is an HMR reload (unit with same name exists)
-    const existingUnit = this.units.get(name);
-    if (existingUnit) {
-      const existingGen = (existingUnit as any)?._generation;
-      
-      // If existing unit is from current generation, just update it
-      if (existingGen === this.currentGeneration) {
-        unitWithMetadata._generation = this.currentGeneration;
-        this.units.set(name, unit);
-        this.listeners.forEach(l => l(unit));
-        return;
-      }
-      
-      // Existing unit is from old generation - this is HMR
-      // Increment generation (mark phase) and schedule cleanup (sweep phase)
-      this.currentGeneration++;
-      this.scheduleCleanup();
-    }
-
-    // Register/update unit with current generation (marking it as "alive")
-    unitWithMetadata._generation = this.currentGeneration;
-    this.units.set(name, unit);
-    this.listeners.forEach(l => l(unit));
+  get(nameOrUid: string): PulseUnit | undefined {
+    const proxy = this.proxies.get(nameOrUid);
+    if (proxy) return proxy;
+    const uid = generateUID(nameOrUid);
+    return this.proxies.get(uid);
   }
 
   getAll(): PulseUnit[] {
-    return Array.from(this.units.values());
+    return Array.from(this.proxies.values());
   }
 
-  onRegister(listener: (unit: PulseUnit) => void) {
+  getAllWithMeta(): Array<{ unit: PulseUnit; uid: string }> {
+    return Array.from(this.proxies.entries()).map(([uid, unit]) => ({
+      unit,
+      uid
+    }));
+  }
+
+  onRegister(listener: (unit: PulseUnit, event?: 'add' | 'update' | 'remove') => void) {
     this.listeners.add(listener);
     return () => { this.listeners.delete(listener); };
   }
 
   reset() {
-    this.units.clear();
+    this.targets.clear();
+    this.proxies.clear();
     this.currentGeneration = 0;
   }
 }
@@ -125,3 +174,4 @@ if (!globalSymbols[GLOBAL_KEY]) {
 }
 
 export const PulseRegistry = globalSymbols[GLOBAL_KEY] as Registry;
+

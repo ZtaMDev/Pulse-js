@@ -50,21 +50,8 @@ Returns a reactive `GuardState` lookalike that you can use directly in your temp
 {#if state.status === "ok"}
   <p>Welcome, {state.value.name}</p>
 {:else if state.status === "fail"}
-  <p style="color: red">Error: {state.reason}</p>
+    <p style="color: red">Error: {state.reason.message}</p>
 {/if}
-```
-
-## Legacy Svelte Stores
-
-If you are using **Svelte 4** or prefer the store syntax (`$variable`), use `usePulseStore`.
-
-```svelte
-<script lang="ts">
-  import { usePulseStore } from "@pulse-js/svelte";
-  const count = usePulseStore(mySource);
-</script>
-
-<p>Value: {$count}</p>
 ```
 
 ## Vite Configuration
@@ -84,4 +71,17 @@ export default defineConfig({
     exclude: ['@pulse-js/svelte']
   }
 })
+```
+
+## Legacy Svelte Stores
+
+If you are using **Svelte 4** or prefer the store syntax (`$variable`), use `usePulseStore`.
+
+```svelte
+<script lang="ts">
+  import { usePulseStore } from "@pulse-js/svelte";
+  const count = usePulseStore(mySource);
+</script>
+
+<p>Value: {$count}</p>
 ```

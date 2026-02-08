@@ -1,0 +1,70 @@
+---
+title: Astro
+description: Using Pulse.js in Astro components.
+---
+
+Pulse.js v2 natively supports Astro. You can use Pulse state to power your Astro pages, with full support for SSR and hydration.
+
+## Installation
+
+Add the Pulse integration to your Astro project:
+
+```bash
+npx astro add @pulse-js/astro
+```
+
+## Usage
+
+### 1. Configuration
+
+Add the integration to your `astro.config.mjs`:
+
+```js
+import { defineConfig } from 'astro/config';
+import pulse from '@pulse-js/astro';
+
+export default defineConfig({
+  integrations: [pulse()],
+});
+```
+
+### 2. State Management
+
+Pulse state can be shared across Astro components and other framework islands (React, Vue, Svelte).
+
+```ts
+// src/store.ts
+import { pulse } from '@pulse-js/core';
+
+export const ui = pulse({
+  theme: 'dark',
+  sidebarOpen: false
+});
+```
+
+### 3. In Astro Components
+
+Use Pulse state directly in your `.astro` files.
+
+```astro
+---
+// src/pages/index.astro
+import { ui } from '../store';
+
+// Access state on the server
+const theme = ui.theme;
+---
+
+<html>
+  <body class={theme}>
+    <h1>Hello Pulse + Astro</h1>
+  </body>
+</html>
+```
+
+## SSR & Hydration
+
+Pulse state accessed in the frontmatter of an Astro component is evaluated during SSR. If you also use Pulse in a client-side island, the state will automatically hydrate.
+
+> [!TIP]
+> Pulse's Proxy-based reactivity makes it ideal for Astro because it doesn't require complex providers or context wrappers.

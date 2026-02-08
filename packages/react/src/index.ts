@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import type { Guard, Source, GuardState } from '@pulse-js/core';
+import type { PulseObject } from '@pulse-js/core';
 
 const isServer = typeof window === 'undefined';
 
@@ -107,6 +108,39 @@ export function useGuard<T>(guard: Guard<T>, options?: UseGuardOptions): GuardSt
 }
 
 /**
+ * Hook for Pulse Objects (v2 Proxy-based reactive objects).
+ * 
+ * Returns a snapshot of the reactive object that triggers re-renders
+ * when any property changes.
+ * 
+ * @template T The type of the Pulse object.
+ * @param pulseObj A Pulse object created with pulse().
+ * @returns The current state of the object.
+ * 
+ * @example
+ * ```tsx
+ * const auth = pulse({ user: null, loading: false });
+ * 
+ * function Profile() {
+ *   const state = usePulseObject(auth);
+ *   if (state.loading) return <Spinner />;
+ *   return <div>{state.user?.name}</div>;
+ * }
+ * ```
+ */
+export function usePulseObject<T extends object>(pulseObj: PulseObject<T>): T {
+  if (isServer) {
+    return pulseObj.$snapshot();
+  }
+  
+  return useSyncExternalStore(
+    pulseObj.$subscribe,
+    () => pulseObj as T,
+    () => pulseObj.$snapshot()
+  );
+}
+
+/**
  * Formats a guard reason for display in React components.
  * Handles both string reasons and GuardReason objects.
  * 
@@ -124,4 +158,5 @@ export function formatReason(reason: string | { toString(): string } | undefined
   if (typeof reason === 'string') return reason;
   return reason.toString();
 }
+
 

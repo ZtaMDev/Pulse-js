@@ -3,7 +3,9 @@ title: Sources
 description: The fundamental unit of state in Pulse.
 ---
 
-Sources are the primitive containers for your application state. They hold values and notify dependents when those values change. Unlike other signals libraries, Pulse Sources are designed to be "dumb" data containers—they don't hold logic, only facts.
+Sources are the primitive containers for your application state. They hold values and notify dependents when those values change. 
+
+> In Pulse v3, for complex objects and deep reactivity, it is highly recommended to use the new [`pulse()`](/core/pulse/) API instead of wrapping objects in a `source()`.
 
 ## Creating a Source
 
