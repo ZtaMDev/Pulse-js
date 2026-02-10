@@ -1,0 +1,17 @@
+{
+  "name": "astro-pulsejs",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@pulse-js/astro": "^0.3.1",
+    "@pulse-js/core": "^0.3.1",
+    "@pulse-js/tools": "^0.3.1",
+    "astro": "^5.17.1"
+  }
+}
